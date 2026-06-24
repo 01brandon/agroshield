@@ -229,3 +229,49 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute='*/30'),
     },
 }
+
+# api rate limiting - prevents abuse and brute force
+REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = [
+    'rest_framework.throttling.AnonRateThrottle',
+    'rest_framework.throttling.UserRateThrottle',
+]
+REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
+    'anon': '60/hour',
+    'user': '1000/hour',
+}
+
+# security headers
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS              = 'DENY'
+SECURE_BROWSER_XSS_FILTER   = True
+
+# cors - only allow known frontends
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8000',
+]
+CORS_ALLOW_CREDENTIALS = True
+
+# api rate limiting - prevents abuse and brute force
+REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = [
+    'rest_framework.throttling.AnonRateThrottle',
+    'rest_framework.throttling.UserRateThrottle',
+]
+REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
+    'anon': '60/hour',
+    'user': '1000/hour',
+}
+
+# security headers
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS              = 'DENY'
+SECURE_BROWSER_XSS_FILTER   = True
+
+# cors - only allow known frontends
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8000',
+]
+CORS_ALLOW_CREDENTIALS = True
