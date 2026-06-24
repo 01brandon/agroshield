@@ -1,0 +1,47 @@
+# Core
+Django==5.0.6
+djangorestframework==3.15.2
+django-environ==0.11.2
+django-cors-headers==4.4.0
+
+# Auth
+django-allauth==0.63.6
+dj-rest-auth==6.0.0
+djangorestframework-simplejwt==5.3.1
+
+# Database
+psycopg2-binary==2.9.9
+
+# Async / Tasks
+celery==5.4.0
+redis==5.0.6
+django-celery-beat==2.6.0
+channels==4.1.0
+channels-redis==4.2.0
+
+# Cloud & Storage
+cloudinary==1.40.0
+django-cloudinary-storage==0.3.0
+google-cloud-vision==3.7.2
+google-cloud-aiplatform==1.57.0
+google-cloud-pubsub==2.21.4
+google-cloud-storage==2.17.0
+
+# APIs
+openai==1.35.3
+requests==2.32.3
+twilio==9.2.3
+sendgrid==6.11.0
+stripe==10.2.0
+
+# Utils
+Pillow==10.3.0
+qrcode==7.4.2
+WeasyPrint==62.3
+drf-spectacular==0.27.2
+django-filter==24.2
+phonenumbers==8.13.39
+paho-mqtt==2.1.0
+
+# Dev
+python-decouple==3.8
