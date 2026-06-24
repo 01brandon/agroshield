@@ -275,3 +275,6 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# third party api keys - loaded from .env
+OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY', default='')
