@@ -211,3 +211,21 @@ USE_I18N = True
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# celery beat schedule - defines when each task runs automatically
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'fetch-weather-every-3-hours': {
+        'task':     'apps.weather.tasks.fetch_weather_for_all_farms',
+        'schedule': crontab(minute=0, hour='*/3'),
+    },
+    'check-food-security-daily': {
+        'task':     'apps.alerts.tasks.check_food_security_risk',
+        'schedule': crontab(minute=0, hour=6),
+    },
+    'send-scheduled-campaigns': {
+        'task':     'apps.campaigns.tasks.send_scheduled_campaigns',
+        'schedule': crontab(minute='*/30'),
+    },
+}
