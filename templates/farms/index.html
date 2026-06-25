@@ -1,0 +1,75 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}my farms - agroshield{% endblock %}
+{% block nav_farms %}active{% endblock %}
+{% block dash_title %}my farms{% endblock %}
+{% block dash_content %}
+
+<div class="page-actions">
+  <button class="btn-primary" id="openAddFarm">+ add new farm</button>
+</div>
+
+<div class="farms-grid" id="farmsGrid">
+  <p class="loading-text">loading your farms...</p>
+</div>
+
+<!-- add farm modal -->
+<div class="modal-overlay" id="addFarmModal">
+  <div class="modal">
+    <h3>add new farm</h3>
+    <form id="addFarmForm">
+      <div class="form-group">
+        <label>farm name</label>
+        <input type="text" name="name" placeholder="e.g. green valley farm" required>
+      </div>
+      <div class="form-group">
+        <label>location</label>
+        <input type="text" name="location_name" placeholder="e.g. nakuru, kenya" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>latitude</label>
+          <input type="number" name="latitude" step="any" placeholder="-0.3031" required>
+        </div>
+        <div class="form-group">
+          <label>longitude</label>
+          <input type="number" name="longitude" step="any" placeholder="36.0800" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>size (hectares)</label>
+          <input type="number" name="size_hectares" step="0.01" placeholder="5.50" required>
+        </div>
+        <div class="form-group">
+          <label>primary crop</label>
+          <select name="primary_crop">
+            <option value="maize">maize</option>
+            <option value="wheat">wheat</option>
+            <option value="rice">rice</option>
+            <option value="coffee">coffee</option>
+            <option value="tea">tea</option>
+            <option value="cassava">cassava</option>
+            <option value="sorghum">sorghum</option>
+            <option value="beans">beans</option>
+            <option value="other">other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>description (optional)</label>
+        <textarea name="description" rows="3" placeholder="tell us about your farm"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-outline" id="closeAddFarm">cancel</button>
+        <button type="submit" class="btn-primary">save farm</button>
+      </div>
+    </form>
+    <p class="form-error" id="farmError"></p>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/farms.js' %}"></script>
+{% endblock %}
