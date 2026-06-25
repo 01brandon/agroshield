@@ -1,0 +1,98 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}marketplace - agroshield{% endblock %}
+{% block nav_market %}active{% endblock %}
+{% block dash_title %}farmer marketplace{% endblock %}
+{% block dash_content %}
+
+<div class="market-tabs">
+  <button class="tab-btn active" data-tab="browse">browse listings</button>
+  <button class="tab-btn" data-tab="my-listings">my listings</button>
+  <button class="tab-btn" data-tab="escrow">escrow</button>
+</div>
+
+<!-- browse tab -->
+<div class="tab-content active" id="tab-browse">
+  <div class="market-filters">
+    <input type="text" id="cropFilter" placeholder="filter by crop...">
+    <button class="btn-outline" onclick="loadListings()">search</button>
+  </div>
+  <div class="listings-grid" id="listingsGrid">
+    <p class="loading-text">loading listings...</p>
+  </div>
+</div>
+
+<!-- my listings tab -->
+<div class="tab-content" id="tab-my-listings">
+  <div class="page-actions">
+    <button class="btn-primary" id="openAddListing">+ create listing</button>
+  </div>
+  <div class="listings-grid" id="myListingsGrid">
+    <p class="loading-text">loading your listings...</p>
+  </div>
+</div>
+
+<!-- escrow tab -->
+<div class="tab-content" id="tab-escrow">
+  <div id="escrowList">
+    <p class="loading-text">loading escrow transactions...</p>
+  </div>
+</div>
+
+<!-- add listing modal -->
+<div class="modal-overlay" id="addListingModal">
+  <div class="modal">
+    <h3>create new listing</h3>
+    <form id="addListingForm">
+      <div class="form-group">
+        <label>select farm</label>
+        <select name="farm" id="listingFarmSelect" required>
+          <option value="">loading...</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>crop</label>
+          <input type="text" name="crop" placeholder="e.g. maize" required>
+        </div>
+        <div class="form-group">
+          <label>grade</label>
+          <select name="grade">
+            <option value="A">grade A</option>
+            <option value="B">grade B</option>
+            <option value="C">grade C</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>quantity (kg)</label>
+          <input type="number" name="quantity_kg" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>price per kg</label>
+          <input type="number" name="price_per_kg" step="0.01" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>description</label>
+        <textarea name="description" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="is_auction"> list as auction
+        </label>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-outline" id="closeAddListing">cancel</button>
+        <button type="submit" class="btn-primary">create listing</button>
+      </div>
+    </form>
+    <p class="form-error" id="listingError"></p>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/marketplace.js' %}"></script>
+{% endblock %}
