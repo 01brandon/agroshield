@@ -44,4 +44,5 @@ phonenumbers==8.13.39
 paho-mqtt==2.1.0
 
 # Dev
-python-decouple==3.8PyJWT==2.8.0
+python-decouple==3.8
+PyJWT==2.8.0

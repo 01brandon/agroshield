@@ -319,3 +319,39 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# twilio sms
+TWILIO_ACCOUNT_SID  = env('TWILIO_ACCOUNT_SID',  default='')
+TWILIO_AUTH_TOKEN   = env('TWILIO_AUTH_TOKEN',    default='')
+TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER',  default='')
+
+# mpesa daraja
+MPESA_CONSUMER_KEY    = env('MPESA_CONSUMER_KEY',    default='')
+MPESA_CONSUMER_SECRET = env('MPESA_CONSUMER_SECRET', default='')
+MPESA_SHORTCODE       = env('MPESA_SHORTCODE',       default='174379')
+MPESA_PASSKEY         = env('MPESA_PASSKEY',         default='')
+MPESA_ENV             = env('MPESA_ENV',             default='sandbox')
+
+# stripe
+STRIPE_SECRET_KEY      = env('STRIPE_SECRET_KEY',      default='')
+STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default='')
+
+# openai
+OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
+
+# sentinel hub
+SENTINELHUB_CLIENT_ID     = env('SENTINELHUB_CLIENT_ID',     default='')
+SENTINELHUB_CLIENT_SECRET = env('SENTINELHUB_CLIENT_SECRET', default='')
+
+# gcp
+GCP_PROJECT_ID  = env('GCP_PROJECT_ID',  default='')
+GCP_PUBSUB_TOPIC = env('GCP_PUBSUB_TOPIC', default='agroshield-scans')
+
+# google credentials file path
+GOOGLE_APPLICATION_CREDENTIALS = str(BASE_DIR / 'service_account.json')
+
+# add satellite task to the schedule
+CELERY_BEAT_SCHEDULE['fetch-ndvi-every-5-days'] = {
+    'task':     'apps.satellite.tasks.fetch_ndvi_for_all_farms',
+    'schedule': crontab(minute=0, hour=0, day_of_week='*/5'),
+}
