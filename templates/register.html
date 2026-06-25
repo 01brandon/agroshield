@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>register - agroshield</title>
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-body">
+<div class="auth-card">
+  <a href="/" class="auth-logo">agro<span>shield</span></a>
+  <h2>create your account</h2>
+  <p>join 50,000 farmers on agroshield</p>
+
+  <form id="registerForm">
+    <div class="form-row">
+      <div class="form-group">
+        <label>first name</label>
+        <input type="text" id="regFirst" placeholder="john" required>
+      </div>
+      <div class="form-group">
+        <label>last name</label>
+        <input type="text" id="regLast" placeholder="doe" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>email address</label>
+      <input type="email" id="regEmail" placeholder="john@example.com" required>
+    </div>
+    <div class="form-group">
+      <label>phone number</label>
+      <input type="tel" id="regPhone" placeholder="+254 700 000000">
+    </div>
+    <div class="form-group">
+      <label>i am a</label>
+      <select id="regRole">
+        <option value="farmer">farmer</option>
+        <option value="buyer">buyer</option>
+        <option value="agronomist">agronomist</option>
+        <option value="ngo">ngo / government</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>country</label>
+      <input type="text" id="regCountry" placeholder="kenya">
+    </div>
+    <div class="form-group">
+      <label>password</label>
+      <input type="password" id="regPassword" placeholder="at least 8 characters" required>
+    </div>
+    <div class="form-group">
+      <label>confirm password</label>
+      <input type="password" id="regPassword2" placeholder="repeat password" required>
+    </div>
+    <p class="form-error" id="regError"></p>
+    <button type="submit" class="btn-primary btn-full">create account</button>
+  </form>
+
+  <p class="auth-switch">
+    already have an account? <a href="/auth/login">sign in here</a>
+  </p>
+</div>
+<script>
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const error = document.getElementById('regError');
+    const body  = {
+      first_name: document.getElementById('regFirst').value,
+      last_name:  document.getElementById('regLast').value,
+      email:      document.getElementById('regEmail').value,
+      phone:      document.getElementById('regPhone').value,
+      role:       document.getElementById('regRole').value,
+      country:    document.getElementById('regCountry').value,
+      password:   document.getElementById('regPassword').value,
+      password2:  document.getElementById('regPassword2').value,
+    };
+
+    try {
+      const res  = await fetch('/api/auth/register/', {
+        method:  'POST',
+        headers: {'Content-Type': 'application/json'},
+        body:    JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem('access',  data.access);
+        localStorage.setItem('refresh', data.refresh);
+        window.location.href = '/dashboard/';
+      } else {
+        const msgs = Object.values(data).flat().join(' ');
+        error.textContent = msgs;
+      }
+    } catch (err) {
+      error.textContent = 'connection error. please try again.';
+    }
+  });
+</script>
+</body>
+</html>

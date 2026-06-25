@@ -1,0 +1,134 @@
+/* dashboard layout */
+.dash-body{display:flex;min-height:100vh;background:#f0f4f0;font-family:'Inter',sans-serif}
+
+/* sidebar */
+.sidebar{width:240px;min-height:100vh;background:#0d1a0d;display:flex;flex-direction:column;padding:24px 0;flex-shrink:0}
+.sidebar-logo{font-size:20px;font-weight:800;color:#fff;padding:0 24px 32px;letter-spacing:-0.5px}
+.sidebar-logo span{color:#a8d85c}
+.sidebar-nav{display:flex;flex-direction:column;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 24px;color:rgba(255,255,255,.55);font-size:14px;font-weight:500;transition:all .15s;text-decoration:none}
+.nav-item:hover,.nav-item.active{color:#fff;background:rgba(168,216,92,.1);border-right:3px solid #a8d85c}
+.nav-icon{font-size:8px;color:#a8d85c}
+.sidebar-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:16px;margin-top:16px}
+
+/* main area */
+.dash-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.dash-header{background:#fff;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8ede8}
+.dash-title{font-size:22px;font-weight:700;color:#1a2e1a;letter-spacing:-0.3px}
+.dash-user{font-size:14px;color:#666;font-weight:500}
+.dash-content{padding:32px;overflow-y:auto;flex:1}
+
+/* stat cards */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:32px}
+.dash-stat{background:#fff;border-radius:12px;padding:24px;border:1px solid #e8ede8}
+.stat-label{font-size:13px;color:#888;font-weight:500;margin-bottom:8px}
+.stat-value{font-size:36px;font-weight:800;color:#1a2e1a;letter-spacing:-1px}
+
+/* dash grid */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.dash-card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e8ede8}
+.dash-card h3{font-size:15px;font-weight:700;margin-bottom:16px;color:#1a2e1a}
+.card-list{display:flex;flex-direction:column;gap:10px;min-height:80px}
+.card-link{display:block;margin-top:16px;font-size:13px;color:#7ab648;font-weight:600}
+.loading-text{color:#aaa;font-size:14px}
+
+/* forms */
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.form-group label{font-size:13px;font-weight:600;color:#444}
+.form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1.5px solid #dde8dd;border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;transition:border .15s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#7ab648}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:8px}
+.form-error{color:#e05252;font-size:13px;margin-top:8px}
+.btn-full{width:100%;justify-content:center}
+
+/* modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:32px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:18px;font-weight:700;margin-bottom:24px;color:#1a2e1a}
+
+/* page actions */
+.page-actions{margin-bottom:24px}
+
+/* farms grid */
+.farms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.farm-card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e8ede8}
+.farm-card h4{font-size:16px;font-weight:700;margin-bottom:8px;color:#1a2e1a}
+.farm-card p{font-size:13px;color:#666;margin-bottom:4px}
+.farm-badge{display:inline-block;background:#f0f8e8;color:#4a7c3f;font-size:12px;font-weight:600;padding:3px 10px;border-radius:50px;margin-top:8px}
+
+/* scan layout */
+.scan-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.scan-upload-box{background:#fff;border-radius:12px;padding:28px;border:1px solid #e8ede8}
+.scan-upload-box h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.scan-upload-box p{font-size:14px;color:#666;margin-bottom:20px}
+.scan-results{background:#fff;border-radius:12px;padding:28px;border:1px solid #e8ede8}
+.scan-results h3{font-size:16px;font-weight:700;margin-bottom:16px}
+.scan-item{padding:14px;border:1px solid #e8ede8;border-radius:8px;margin-bottom:10px}
+.scan-item h5{font-size:14px;font-weight:600;margin-bottom:4px}
+.scan-item p{font-size:13px;color:#666}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:50px}
+.badge-pending{background:#fff3cd;color:#856404}
+.badge-confirmed{background:#d4edda;color:#155724}
+.badge-disputed{background:#f8d7da;color:#721c24}
+
+/* weather layout */
+.weather-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.weather-alerts-panel,.weather-readings-panel{background:#fff;border-radius:12px;padding:28px;border:1px solid #e8ede8}
+.alert-item{padding:14px;border-radius:8px;margin-bottom:10px;border-left:4px solid #e05252;background:#fff5f5}
+.alert-item.drought{border-color:#f59e0b;background:#fffbeb}
+.alert-item.flood{border-color:#3b82f6;background:#eff6ff}
+.alert-item.heat{border-color:#ef4444;background:#fef2f2}
+.reading-item{padding:14px;border:1px solid #e8ede8;border-radius:8px;margin-bottom:10px}
+
+/* marketplace */
+.market-tabs{display:flex;gap:4px;margin-bottom:24px;background:#fff;padding:6px;border-radius:12px;border:1px solid #e8ede8;width:fit-content}
+.tab-btn{padding:8px 20px;border:none;background:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;color:#666;transition:all .15s}
+.tab-btn.active{background:#1a2e1a;color:#fff}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.listing-card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e8ede8}
+.listing-card h4{font-size:16px;font-weight:700;margin-bottom:6px}
+.listing-card .price{font-size:20px;font-weight:800;color:#4a7c3f}
+.market-filters{display:flex;gap:12px;margin-bottom:20px}
+.market-filters input{flex:1;padding:10px 14px;border:1.5px solid #dde8dd;border-radius:8px;font-size:14px;outline:none}
+
+/* forum */
+.forum-layout{display:grid;grid-template-columns:1fr 300px;gap:24px}
+.forum-posts{flex:1}
+.forum-sidebar .dash-card{position:sticky;top:20px}
+.post-item{background:#fff;border-radius:12px;padding:24px;border:1px solid #e8ede8;margin-bottom:16px;cursor:pointer;transition:box-shadow .15s}
+.post-item:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.post-item h4{font-size:15px;font-weight:700;margin-bottom:6px}
+.post-item p{font-size:13px;color:#666;margin-bottom:10px}
+.post-meta{display:flex;gap:16px;font-size:12px;color:#aaa}
+.crop-tag{display:inline-block;background:#f0f8e8;color:#4a7c3f;font-size:11px;font-weight:600;padding:2px 8px;border-radius:50px}
+
+/* auth pages */
+.auth-body{min-height:100vh;background:linear-gradient(135deg,#0d1a0d 0%,#1a3a1a 100%);display:flex;align-items:center;justify-content:center;padding:24px}
+.auth-card{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:460px}
+.auth-logo{font-size:24px;font-weight:800;color:#1a2e1a;display:block;margin-bottom:28px;text-decoration:none}
+.auth-logo span{color:#7ab648}
+.auth-card h2{font-size:26px;font-weight:800;margin-bottom:6px;letter-spacing:-0.5px}
+.auth-card>p{color:#666;margin-bottom:28px}
+.auth-divider{text-align:center;margin:20px 0;color:#ccc;font-size:13px;position:relative}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:43%;height:1px;background:#eee}
+.auth-divider::before{left:0}
+.auth-divider::after{right:0}
+.btn-google{display:block;text-align:center;padding:12px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;font-weight:600;color:#333;transition:all .15s}
+.btn-google:hover{border-color:#7ab648;color:#4a7c3f}
+.auth-switch{text-align:center;margin-top:24px;font-size:14px;color:#666}
+.auth-switch a{color:#7ab648;font-weight:600}
+
+/* responsive */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .dash-grid,.scan-layout,.weather-layout,.forum-layout{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+}
