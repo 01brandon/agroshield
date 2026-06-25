@@ -8,10 +8,47 @@ from .serializers import RegisterSerializer, UserSerializer, ChangePasswordSeria
 
 User = get_user_model()
 
+# page views
 def landing(request):
-    # serves the landing page
     return render(request, 'index.html')
 
+def login_page(request):
+    return render(request, 'login.html')
+
+def register_page(request):
+    return render(request, 'register.html')
+
+def dashboard_home(request):
+    return render(request, 'dashboard/index.html')
+
+def farms_page(request):
+    return render(request, 'farms/index.html')
+
+def disease_page(request):
+    return render(request, 'disease/index.html')
+
+def weather_page(request):
+    return render(request, 'weather/index.html')
+
+def marketplace_page(request):
+    return render(request, 'marketplace/index.html')
+
+def forum_page(request):
+    return render(request, 'forum/index.html')
+
+def academy_page(request):
+    return render(request, 'academy/index.html')
+
+def finance_page(request):
+    return render(request, 'dashboard/finance.html')
+
+def insurance_page(request):
+    return render(request, 'dashboard/insurance.html')
+
+def carbon_page(request):
+    return render(request, 'dashboard/carbon.html')
+
+# api views
 class RegisterView(generics.CreateAPIView):
     queryset           = User.objects.all()
     serializer_class   = RegisterSerializer
@@ -58,17 +95,3 @@ class LogoutView(APIView):
             return Response({'message': 'logged out successfully'})
         except Exception:
             return Response({'error': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-from django.shortcuts import render
-
-def landing(request):
-    # landing page view
-    return render(request, 'index.html')
-
-
-from django.shortcuts import render
-
-def landing(request):
-    # landing page view
-    return render(request, 'index.html')

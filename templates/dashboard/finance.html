@@ -1,0 +1,42 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}finance - agroshield{% endblock %}
+{% block nav_finance %}active{% endblock %}
+{% block dash_title %}farm finance{% endblock %}
+{% block dash_content %}
+<div class="dash-grid">
+  <div class="dash-card">
+    <h3>profit & loss summary</h3>
+    <div id="financeSummary"><p class="loading-text">loading...</p></div>
+  </div>
+  <div class="dash-card">
+    <h3>recent ledger entries</h3>
+    <div id="ledgerList"><p class="loading-text">loading...</p></div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const sumRes = await apiFetch('/api/finance/ledger/summary/');
+  if (sumRes && sumRes.ok) {
+    const d = await sumRes.json();
+    document.getElementById('financeSummary').innerHTML = `
+      <div class="dash-stat"><p class="stat-label">income</p><h2 class="stat-value" style="color:#4a7c3f">ksh ${d.income}</h2></div>
+      <div class="dash-stat"><p class="stat-label">expenses</p><h2 class="stat-value" style="color:#e05252">ksh ${d.expenses}</h2></div>
+      <div class="dash-stat"><p class="stat-label">profit</p><h2 class="stat-value">ksh ${d.profit}</h2></div>`;
+  }
+
+  const ledgerRes = await apiFetch('/api/finance/ledger/');
+  if (ledgerRes && ledgerRes.ok) {
+    const data    = await ledgerRes.json();
+    const entries = data.results || data;
+    const list    = document.getElementById('ledgerList');
+    list.innerHTML = '';
+    entries.forEach(e => {
+      list.innerHTML += `<div class="scan-item"><h5>${e.description} <span class="badge badge-${e.entry_type === 'sale' ? 'confirmed' : 'pending'}">${e.entry_type}</span></h5><p>ksh ${e.amount} &bull; ${e.date}</p></div>`;
+    });
+    if (!entries.length) list.innerHTML = '<p class="loading-text">no entries yet.</p>';
+  }
+});
+</script>
+{% endblock %}

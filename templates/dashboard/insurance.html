@@ -1,0 +1,26 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}insurance - agroshield{% endblock %}
+{% block nav_insurance %}active{% endblock %}
+{% block dash_title %}crop insurance{% endblock %}
+{% block dash_content %}
+<div class="dash-card">
+  <h3>my insurance policies</h3>
+  <div id="policiesList"><p class="loading-text">loading...</p></div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const res = await apiFetch('/api/insurance/');
+  if (!res || !res.ok) return;
+  const data     = await res.json();
+  const policies = data.results || data;
+  const list     = document.getElementById('policiesList');
+  list.innerHTML = '';
+  policies.forEach(p => {
+    list.innerHTML += `<div class="scan-item"><h5>${p.crop} policy <span class="badge badge-${p.status === 'active' ? 'confirmed' : 'pending'}">${p.status}</span></h5><p>premium: ksh ${p.premium} &bull; payout: ksh ${p.payout_amount}</p><p style="font-size:12px;color:#888">${p.start_date} to ${p.end_date}</p></div>`;
+  });
+  if (!policies.length) list.innerHTML = '<p class="loading-text">no policies yet. contact support to get covered.</p>';
+});
+</script>
+{% endblock %}
