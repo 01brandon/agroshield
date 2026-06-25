@@ -6,17 +6,18 @@ from apps.farms.models import Farm
 
 @shared_task
 def fetch_weather_for_all_farms():
-    # runs every 3 hours via celery beat - polls openweathermap for every farm
-    farms = Farm.objects.all()
-    api_key = settings.OPENWEATHER_API_KEY if hasattr(settings, 'OPENWEATHER_API_KEY') else None
+    # runs every 3 hours - polls openweathermap for every registered farm
+    farms   = Farm.objects.select_related('owner').all()
+    api_key = getattr(settings, 'OPENWEATHER_API_KEY', '')
 
     for farm in farms:
         try:
             if api_key and api_key != 'your_openweather_key':
-                url = f'https://api.openweathermap.org/data/2.5/weather?lat={farm.latitude}&lon={farm.longitude}&appid={api_key}&units=metric'
+                url  = f'https://api.openweathermap.org/data/2.5/weather?lat={farm.latitude}&lon={farm.longitude}&appid={api_key}&units=metric'
                 resp = requests.get(url, timeout=10)
+
                 if resp.status_code == 200:
-                    data = resp.json()
+                    data     = resp.json()
                     temp     = data['main']['temp']
                     humidity = data['main']['humidity']
                     wind     = data['wind']['speed']
@@ -31,29 +32,61 @@ def fetch_weather_for_all_farms():
                         description = desc,
                     )
 
-                    # check thresholds and create alert if needed
-                    if temp > 38:
-                        WeatherAlert.objects.create(
-                            farm       = farm,
-                            alert_type = 'heat',
-                            severity   = 4,
-                            message    = f'extreme heat warning: {temp}c recorded at {farm.name}',
-                            temperature= temp,
-                            humidity   = humidity,
-                            wind_speed = wind,
-                        )
-                    if humidity > 90:
-                        WeatherAlert.objects.create(
-                            farm       = farm,
-                            alert_type = 'pest',
-                            severity   = 3,
-                            message    = f'high humidity {humidity}% - pest risk elevated at {farm.name}',
-                            temperature= temp,
-                            humidity   = humidity,
-                            wind_speed = wind,
-                        )
+                    # check thresholds and fire alerts
+                    _check_and_alert(farm, temp, humidity, wind)
+
         except Exception as e:
-            # log error silently and continue to next farm
             print(f'weather fetch failed for farm {farm.id}: {e}')
 
     return f'weather fetched for {farms.count()} farms'
+
+
+def _check_and_alert(farm, temp, humidity, wind):
+    # creates alerts and sends sms if conditions exceed safe thresholds
+    from .sms import send_sms_alert
+
+    alerts_to_send = []
+
+    if temp > 38:
+        alert = WeatherAlert.objects.create(
+            farm       = farm,
+            alert_type = 'heat',
+            severity   = 4,
+            message    = f'extreme heat warning: {temp}c at {farm.name}. reduce irrigation frequency and provide shade where possible.',
+            temperature= temp,
+            humidity   = humidity,
+            wind_speed = wind,
+        )
+        alerts_to_send.append(alert)
+
+    if humidity > 90:
+        alert = WeatherAlert.objects.create(
+            farm       = farm,
+            alert_type = 'pest',
+            severity   = 3,
+            message    = f'high humidity {humidity}% at {farm.name}. fungal disease and pest risk is elevated. inspect crops within 24 hours.',
+            temperature= temp,
+            humidity   = humidity,
+            wind_speed = wind,
+        )
+        alerts_to_send.append(alert)
+
+    if temp < 5:
+        alert = WeatherAlert.objects.create(
+            farm       = farm,
+            alert_type = 'frost',
+            severity   = 5,
+            message    = f'frost warning: temperature at {temp}c near {farm.name}. protect sensitive crops immediately.',
+            temperature= temp,
+            humidity   = humidity,
+            wind_speed = wind,
+        )
+        alerts_to_send.append(alert)
+
+    # send sms for each alert if farmer has a phone number
+    farmer_phone = farm.owner.phone
+    if farmer_phone and alerts_to_send:
+        for alert in alerts_to_send:
+            send_sms_alert(farmer_phone, f'agroshield alert: {alert.message}')
+            alert.notified = True
+            alert.save()
