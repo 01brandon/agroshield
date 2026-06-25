@@ -58,3 +58,17 @@ class LogoutView(APIView):
             return Response({'message': 'logged out successfully'})
         except Exception:
             return Response({'error': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+from django.shortcuts import render
+
+def landing(request):
+    # landing page view
+    return render(request, 'index.html')
+
+
+from django.shortcuts import render
+
+def landing(request):
+    # landing page view
+    return render(request, 'index.html')

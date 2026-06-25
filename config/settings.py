@@ -278,3 +278,44 @@ CORS_ALLOW_CREDENTIALS = True
 
 # third party api keys - loaded from .env
 OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY', default='')
+
+# celery beat schedule - defines when each task runs automatically
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'fetch-weather-every-3-hours': {
+        'task':     'apps.weather.tasks.fetch_weather_for_all_farms',
+        'schedule': crontab(minute=0, hour='*/3'),
+    },
+    'check-food-security-daily': {
+        'task':     'apps.alerts.tasks.check_food_security_risk',
+        'schedule': crontab(minute=0, hour=6),
+    },
+    'send-scheduled-campaigns': {
+        'task':     'apps.campaigns.tasks.send_scheduled_campaigns',
+        'schedule': crontab(minute='*/30'),
+    },
+}
+
+# api rate limiting - prevents abuse and brute force
+REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = [
+    'rest_framework.throttling.AnonRateThrottle',
+    'rest_framework.throttling.UserRateThrottle',
+]
+REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
+    'anon': '60/hour',
+    'user': '1000/hour',
+}
+
+# security headers
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS              = 'DENY'
+SECURE_BROWSER_XSS_FILTER   = True
+
+# cors - only allow known frontends
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8000',
+]
+CORS_ALLOW_CREDENTIALS = True

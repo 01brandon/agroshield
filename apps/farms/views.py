@@ -7,4 +7,5 @@ class FarmViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # return only the current user's farms
         return Farm.objects.filter(owner=self.request.user)

@@ -4,7 +4,7 @@ from .models import WeatherAlert, WeatherReading
 @admin.register(WeatherAlert)
 class WeatherAlertAdmin(admin.ModelAdmin):
     list_display = ['farm','alert_type','severity','notified','created_at']
-    list_filter  = ['alert_type']
+    list_filter  = ['alert_type','severity']
 
 @admin.register(WeatherReading)
 class WeatherReadingAdmin(admin.ModelAdmin):

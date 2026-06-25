@@ -3,10 +3,12 @@ from apps.farms.models import Farm
 
 class WeatherAlert(models.Model):
     ALERT_TYPES = [('drought','Drought'),('flood','Flood'),('frost','Frost'),('pest','Pest'),('heat','Heat')]
+    SEVERITY    = [(i, str(i)) for i in range(1, 6)]
+    CHANNELS    = [('sms','SMS'),('push','Push'),('app','App')]
 
-    farm        = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='weather_alerts')
+    farm        = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='alerts')
     alert_type  = models.CharField(max_length=20, choices=ALERT_TYPES)
-    severity    = models.IntegerField(default=1)
+    severity    = models.IntegerField(choices=SEVERITY)
     message     = models.TextField()
     temperature = models.FloatField(null=True, blank=True)
     humidity    = models.FloatField(null=True, blank=True)
@@ -18,7 +20,7 @@ class WeatherAlert(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'{self.farm.name} - {self.alert_type}'
+        return f'{self.farm.name} - {self.alert_type} (severity {self.severity})'
 
 class WeatherReading(models.Model):
     farm        = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='weather_readings')
@@ -31,6 +33,3 @@ class WeatherReading(models.Model):
 
     class Meta:
         ordering = ['-recorded_at']
-
-    def __str__(self):
-        return f'{self.farm.name} reading {self.recorded_at}'

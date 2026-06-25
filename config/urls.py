@@ -1,4 +1,5 @@
 from django.contrib import admin
+from apps.accounts.views import landing
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from apps.accounts.views import landing

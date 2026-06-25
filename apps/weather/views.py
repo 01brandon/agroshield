@@ -7,6 +7,7 @@ class WeatherAlertViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # return alerts for the current user's farms
         return WeatherAlert.objects.filter(farm__owner=self.request.user)
 
 class WeatherReadingViewSet(viewsets.ReadOnlyModelViewSet):
