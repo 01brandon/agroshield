@@ -46,3 +46,4 @@ paho-mqtt==2.1.0
 # Dev
 python-decouple==3.8
 PyJWT==2.8.0
+whitenoise==6.7.0
