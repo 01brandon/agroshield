@@ -333,8 +333,6 @@ MPESA_PASSKEY         = env('MPESA_PASSKEY',         default='')
 MPESA_ENV             = env('MPESA_ENV',             default='sandbox')
 
 # stripe
-STRIPE_SECRET_KEY      = env('STRIPE_SECRET_KEY',      default='')
-STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default='')
 
 # openai
 OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
@@ -355,3 +353,8 @@ CELERY_BEAT_SCHEDULE['fetch-ndvi-every-5-days'] = {
     'task':     'apps.satellite.tasks.fetch_ndvi_for_all_farms',
     'schedule': crontab(minute=0, hour=0, day_of_week='*/5'),
 }
+
+# flutterwave - african payment gateway replacing stripe
+FLUTTERWAVE_PUBLIC_KEY    = env('FLUTTERWAVE_PUBLIC_KEY',    default='')
+FLUTTERWAVE_SECRET_KEY    = env('FLUTTERWAVE_SECRET_KEY',    default='')
+FLUTTERWAVE_ENCRYPTION_KEY = env('FLUTTERWAVE_ENCRYPTION_KEY', default='')
