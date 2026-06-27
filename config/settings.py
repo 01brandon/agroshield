@@ -358,3 +358,8 @@ CELERY_BEAT_SCHEDULE['fetch-ndvi-every-5-days'] = {
 FLUTTERWAVE_PUBLIC_KEY    = env('FLUTTERWAVE_PUBLIC_KEY',    default='')
 FLUTTERWAVE_SECRET_KEY    = env('FLUTTERWAVE_SECRET_KEY',    default='')
 FLUTTERWAVE_ENCRYPTION_KEY = env('FLUTTERWAVE_ENCRYPTION_KEY', default='')
+
+# mpesa b2c security credential - encrypted initiator password
+MPESA_SECURITY_CREDENTIAL = env('MPESA_SECURITY_CREDENTIAL', default='')
+
+MPESA_SECURITY_CREDENTIAL = env('MPESA_SECURITY_CREDENTIAL', default='')
