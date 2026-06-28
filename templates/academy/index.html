@@ -24,17 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const list    = document.getElementById('coursesList');
     list.innerHTML = '';
     courses.forEach(c => {
-      list.innerHTML += `
-        <div class="scan-item">
-          <h5>${c.title}</h5>
-          <p>${c.description.substring(0,80)}...</p>
-          <p style="font-size:12px;color:#888">${c.duration} minutes</p>
-          <button onclick="enroll(${c.id})" class="btn-primary" style="margin-top:8px;font-size:12px;padding:6px 14px">enroll</button>
-        </div>`;
+      list.innerHTML += `<div class="scan-item"><h5>${c.title}</h5><p>${c.description.substring(0,80)}...</p><p style="font-size:12px;color:#888">${c.duration} minutes</p><button onclick="enroll(${c.id})" class="btn-primary" style="margin-top:8px;font-size:12px;padding:6px 14px">enroll</button></div>`;
     });
     if (!courses.length) list.innerHTML = '<p class="loading-text">no courses available yet.</p>';
   }
-
   const enrollRes = await apiFetch('/api/academy/enrollments/');
   if (enrollRes && enrollRes.ok) {
     const data        = await enrollRes.json();
@@ -42,22 +35,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const list        = document.getElementById('enrollmentsList');
     list.innerHTML    = '';
     enrollments.forEach(e => {
-      list.innerHTML += `<div class="scan-item"><h5>${e.course}</h5><p>progress: ${e.progress_pct}% ${e.completed ? '- completed' : ''}</p></div>`;
+      list.innerHTML += `<div class="scan-item"><h5>course ${e.course}</h5><p>progress: ${e.progress_pct}% ${e.completed ? '- completed' : ''}</p></div>`;
     });
     if (!enrollments.length) list.innerHTML = '<p class="loading-text">not enrolled in any courses yet.</p>';
   }
 });
-
 async function enroll(courseId) {
-  const res = await apiFetch('/api/academy/enrollments/', {
-    method: 'POST',
-    body:   JSON.stringify({course: courseId}),
-  });
+  const res = await apiFetch('/api/academy/enrollments/', {method:'POST', body: JSON.stringify({course: courseId})});
   if (res && res.ok) alert('enrolled successfully');
-  else if (res) {
-    const data = await res.json();
-    alert(Object.values(data).flat().join(' '));
-  }
 }
 </script>
 {% endblock %}

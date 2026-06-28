@@ -1,21 +1,25 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from apps.accounts.views import (
     landing, login_page, register_page, dashboard_home,
     farms_page, disease_page, weather_page, marketplace_page,
     forum_page, academy_page, finance_page, insurance_page, carbon_page,
+    about_page, contact_page,
 )
 
 urlpatterns = [
-    # landing
     path('',                        landing,           name='home'),
+    path('about/',                  about_page,        name='about'),
+    path('contact/',                contact_page,      name='contact'),
 
-    # auth pages
     path('auth/login',              login_page,        name='login-page'),
+    path('auth/login/',             login_page,        name='login-page-slash'),
     path('register',                register_page,     name='register-page'),
+    path('register/',               register_page,     name='register-page-slash'),
 
-    # dashboard pages
     path('dashboard/',              dashboard_home,    name='dashboard-home'),
     path('dashboard/farms/',        farms_page,        name='farms-page'),
     path('dashboard/disease/',      disease_page,      name='disease-page'),
@@ -27,15 +31,15 @@ urlpatterns = [
     path('dashboard/insurance/',    insurance_page,    name='insurance-page'),
     path('dashboard/carbon/',       carbon_page,       name='carbon-page'),
 
-    # admin
+    # allauth handles google oauth flow
+    path('accounts/',               include('allauth.urls')),
+
     path('admin/',                  admin.site.urls),
 
-    # api docs
-    path('api/schema/',             SpectacularAPIView.as_view(),                        name='schema'),
-    path('api/schema/swagger-ui/',  SpectacularSwaggerView.as_view(url_name='schema'),  name='swagger-ui'),
-    path('api/schema/redoc/',       SpectacularRedocView.as_view(url_name='schema'),    name='redoc'),
+    path('api/schema/',             SpectacularAPIView.as_view(),                       name='schema'),
+    path('api/schema/swagger-ui/',  SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/',       SpectacularRedocView.as_view(url_name='schema'),   name='redoc'),
 
-    # api endpoints
     path('api/auth/',               include('apps.accounts.urls')),
     path('api/farms/',              include('apps.farms.urls')),
     path('api/disease/',            include('apps.disease.urls')),
@@ -57,4 +61,4 @@ urlpatterns = [
     path('api/alerts/',             include('apps.alerts.urls')),
     path('api/equipment/',          include('apps.equipment.urls')),
     path('api/campaigns/',          include('apps.campaigns.urls')),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

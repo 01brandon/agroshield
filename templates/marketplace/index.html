@@ -10,7 +10,6 @@
   <button class="tab-btn" data-tab="escrow">escrow</button>
 </div>
 
-<!-- browse tab -->
 <div class="tab-content active" id="tab-browse">
   <div class="market-filters">
     <input type="text" id="cropFilter" placeholder="filter by crop...">
@@ -21,7 +20,6 @@
   </div>
 </div>
 
-<!-- my listings tab -->
 <div class="tab-content" id="tab-my-listings">
   <div class="page-actions">
     <button class="btn-primary" id="openAddListing">+ create listing</button>
@@ -31,14 +29,12 @@
   </div>
 </div>
 
-<!-- escrow tab -->
 <div class="tab-content" id="tab-escrow">
   <div id="escrowList">
     <p class="loading-text">loading escrow transactions...</p>
   </div>
 </div>
 
-<!-- add listing modal -->
 <div class="modal-overlay" id="addListingModal">
   <div class="modal">
     <h3>create new listing</h3>
@@ -78,9 +74,7 @@
         <textarea name="description" rows="2"></textarea>
       </div>
       <div class="form-group">
-        <label>
-          <input type="checkbox" name="is_auction"> list as auction
-        </label>
+        <label><input type="checkbox" name="is_auction"> list as auction</label>
       </div>
       <div class="form-actions">
         <button type="button" class="btn-outline" id="closeAddListing">cancel</button>
@@ -94,5 +88,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/marketplace.js' %}"></script>
+<script src="/static/js/marketplace.js"></script>
 {% endblock %}

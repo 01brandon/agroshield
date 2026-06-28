@@ -132,3 +132,24 @@
   .stats-row{grid-template-columns:1fr}
   .form-row{grid-template-columns:1fr}
 }
+
+.auth-card .form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  width:100%;
+}
+.auth-card .form-row .form-group{
+  min-width:0;
+  width:100%;
+}
+.auth-card .form-row input{
+  width:100%;
+  box-sizing:border-box;
+}
+.auth-card{
+  overflow:hidden;
+  box-sizing:border-box;
+  width:100%;
+  max-width:460px;
+}

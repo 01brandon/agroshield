@@ -22,13 +22,12 @@
       </div>
       <div class="form-group">
         <label>notes (optional)</label>
-        <textarea name="notes" rows="3" placeholder="describe what you are seeing e.g. yellowing leaves, brown spots..."></textarea>
+        <textarea name="notes" rows="3" placeholder="describe what you are seeing..."></textarea>
       </div>
       <button type="submit" class="btn-primary">submit for diagnosis</button>
       <p class="form-error" id="scanError"></p>
     </form>
   </div>
-
   <div class="scan-results">
     <h3>recent scans</h3>
     <div id="scansList">
@@ -40,5 +39,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/disease.js' %}"></script>
+<script src="/static/js/disease.js"></script>
 {% endblock %}

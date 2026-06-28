@@ -370,3 +370,8 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # whitenoise serves static files efficiently
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# redirect to dashboard after google oauth login
+LOGIN_REDIRECT_URL  = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'

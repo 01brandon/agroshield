@@ -21,7 +21,6 @@
   </div>
 </div>
 
-<!-- new post modal -->
 <div class="modal-overlay" id="newPostModal">
   <div class="modal">
     <h3>ask the community</h3>
@@ -32,7 +31,7 @@
       </div>
       <div class="form-group">
         <label>details</label>
-        <textarea name="body" rows="4" placeholder="describe your situation in detail..." required></textarea>
+        <textarea name="body" rows="4" placeholder="describe your situation..." required></textarea>
       </div>
       <div class="form-group">
         <label>crop tag (optional)</label>
@@ -50,5 +49,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/forum.js' %}"></script>
+<script src="/static/js/forum.js"></script>
 {% endblock %}
