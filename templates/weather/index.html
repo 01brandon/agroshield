@@ -1,0 +1,26 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}weather - agroshield{% endblock %}
+{% block nav_weather %}active{% endblock %}
+{% block dash_title %}weather intelligence{% endblock %}
+{% block dash_content %}
+
+<div class="weather-layout">
+  <div class="weather-alerts-panel">
+    <h3>active alerts</h3>
+    <div id="alertsList">
+      <p class="loading-text">loading alerts...</p>
+    </div>
+  </div>
+  <div class="weather-readings-panel">
+    <h3>recent readings</h3>
+    <div id="readingsList">
+      <p class="loading-text">loading readings...</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/weather.js"></script>
+{% endblock %}

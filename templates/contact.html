@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}contact - agroshield{% endblock %}
+{% block content %}
+<section style="padding:120px 24px 80px;max-width:600px;margin:0 auto">
+  <h1 style="font-size:48px;font-weight:800;margin-bottom:8px;color:#1a2e1a">contact us</h1>
+  <p style="color:#666;margin-bottom:40px;font-size:17px">we would love to hear from you</p>
+  <div style="background:#fff;border-radius:16px;padding:40px;border:1px solid #e8ede8">
+    <div class="form-group">
+      <label>your name</label>
+      <input type="text" placeholder="john doe">
+    </div>
+    <div class="form-group">
+      <label>email address</label>
+      <input type="email" placeholder="john@example.com">
+    </div>
+    <div class="form-group">
+      <label>message</label>
+      <textarea rows="5" placeholder="how can we help you?"></textarea>
+    </div>
+    <button class="btn-primary btn-full">send message</button>
+  </div>
+</section>
+{% endblock %}
