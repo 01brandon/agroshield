@@ -5,7 +5,6 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# System deps needed by WeasyPrint and psycopg2
 RUN apt-get update && apt-get install -y \
     build-essential libpq-dev \
     libpango-1.0-0 libpangocairo-1.0-0 libcairo2 \
@@ -15,6 +14,9 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
+
+# Create staticfiles dir as a safety net even if collectstatic fails to run elsewhere
+RUN mkdir -p /app/staticfiles
 
 EXPOSE 8000
 
