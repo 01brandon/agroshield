@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import environ
+import dj_database_url
+from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,6 +13,7 @@ environ.Env.read_env(BASE_DIR / '.env')
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost'])
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -103,16 +106,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
+# Database - uses DATABASE_URL if present (Railway), falls back to discrete vars locally
+if env('DATABASE_URL', default=None):
+    DATABASES = {
+        'default': dj_database_url.config(default=env('DATABASE_URL'))
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST'),
+            'PORT': env('DB_PORT'),
+        }
+    }
 
 REDIS_URL = env('REDIS_URL')
 
@@ -178,6 +187,14 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '60/hour',
+        'user': '1000/hour',
+    },
 }
 
 SPECTACULAR_SETTINGS = {
@@ -197,13 +214,17 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
-CORS_ALLOWED_ORIGINS = [
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-]
+    'http://localhost:8000',
+])
+CORS_ALLOW_CREDENTIALS = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 
 LANGUAGE_CODE = 'en-us'
@@ -213,165 +234,59 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# celery beat schedule - defines when each task runs automatically
-from celery.schedules import crontab
-
-CELERY_BEAT_SCHEDULE = {
-    'fetch-weather-every-3-hours': {
-        'task':     'apps.weather.tasks.fetch_weather_for_all_farms',
-        'schedule': crontab(minute=0, hour='*/3'),
-    },
-    'check-food-security-daily': {
-        'task':     'apps.alerts.tasks.check_food_security_risk',
-        'schedule': crontab(minute=0, hour=6),
-    },
-    'send-scheduled-campaigns': {
-        'task':     'apps.campaigns.tasks.send_scheduled_campaigns',
-        'schedule': crontab(minute='*/30'),
-    },
-}
-
-# api rate limiting - prevents abuse and brute force
-REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = [
-    'rest_framework.throttling.AnonRateThrottle',
-    'rest_framework.throttling.UserRateThrottle',
-]
-REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
-    'anon': '60/hour',
-    'user': '1000/hour',
-}
-
-# security headers
+# Security headers
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS              = 'DENY'
-SECURE_BROWSER_XSS_FILTER   = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_BROWSER_XSS_FILTER = True
 
-# cors - only allow known frontends
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:8000',
-]
-CORS_ALLOW_CREDENTIALS = True
-
-# api rate limiting - prevents abuse and brute force
-REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = [
-    'rest_framework.throttling.AnonRateThrottle',
-    'rest_framework.throttling.UserRateThrottle',
-]
-REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
-    'anon': '60/hour',
-    'user': '1000/hour',
-}
-
-# security headers
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS              = 'DENY'
-SECURE_BROWSER_XSS_FILTER   = True
-
-# cors - only allow known frontends
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:8000',
-]
-CORS_ALLOW_CREDENTIALS = True
-
-# third party api keys - loaded from .env
+# Third-party API keys - loaded from env
 OPENWEATHER_API_KEY = env('OPENWEATHER_API_KEY', default='')
 
-# celery beat schedule - defines when each task runs automatically
-from celery.schedules import crontab
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='')
 
+MPESA_CONSUMER_KEY = env('MPESA_CONSUMER_KEY', default='')
+MPESA_CONSUMER_SECRET = env('MPESA_CONSUMER_SECRET', default='')
+MPESA_SHORTCODE = env('MPESA_SHORTCODE', default='174379')
+MPESA_PASSKEY = env('MPESA_PASSKEY', default='')
+MPESA_ENV = env('MPESA_ENV', default='sandbox')
+MPESA_SECURITY_CREDENTIAL = env('MPESA_SECURITY_CREDENTIAL', default='')
+
+OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
+
+SENTINELHUB_CLIENT_ID = env('SENTINELHUB_CLIENT_ID', default='')
+SENTINELHUB_CLIENT_SECRET = env('SENTINELHUB_CLIENT_SECRET', default='')
+
+GCP_PROJECT_ID = env('GCP_PROJECT_ID', default='')
+GCP_PUBSUB_TOPIC = env('GCP_PUBSUB_TOPIC', default='agroshield-scans')
+GOOGLE_APPLICATION_CREDENTIALS = str(BASE_DIR / 'service_account.json')
+
+FLUTTERWAVE_PUBLIC_KEY = env('FLUTTERWAVE_PUBLIC_KEY', default='')
+FLUTTERWAVE_SECRET_KEY = env('FLUTTERWAVE_SECRET_KEY', default='')
+FLUTTERWAVE_ENCRYPTION_KEY = env('FLUTTERWAVE_ENCRYPTION_KEY', default='')
+
+# Celery beat schedule
 CELERY_BEAT_SCHEDULE = {
     'fetch-weather-every-3-hours': {
-        'task':     'apps.weather.tasks.fetch_weather_for_all_farms',
+        'task': 'apps.weather.tasks.fetch_weather_for_all_farms',
         'schedule': crontab(minute=0, hour='*/3'),
     },
     'check-food-security-daily': {
-        'task':     'apps.alerts.tasks.check_food_security_risk',
+        'task': 'apps.alerts.tasks.check_food_security_risk',
         'schedule': crontab(minute=0, hour=6),
     },
     'send-scheduled-campaigns': {
-        'task':     'apps.campaigns.tasks.send_scheduled_campaigns',
+        'task': 'apps.campaigns.tasks.send_scheduled_campaigns',
         'schedule': crontab(minute='*/30'),
+    },
+    'fetch-ndvi-every-5-days': {
+        'task': 'apps.satellite.tasks.fetch_ndvi_for_all_farms',
+        'schedule': crontab(minute=0, hour=0, day_of_week='*/5'),
     },
 }
 
-# api rate limiting - prevents abuse and brute force
-REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = [
-    'rest_framework.throttling.AnonRateThrottle',
-    'rest_framework.throttling.UserRateThrottle',
-]
-REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
-    'anon': '60/hour',
-    'user': '1000/hour',
-}
-
-# security headers
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS              = 'DENY'
-SECURE_BROWSER_XSS_FILTER   = True
-
-# cors - only allow known frontends
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:8000',
-]
-CORS_ALLOW_CREDENTIALS = True
-
-# twilio sms
-TWILIO_ACCOUNT_SID  = env('TWILIO_ACCOUNT_SID',  default='')
-TWILIO_AUTH_TOKEN   = env('TWILIO_AUTH_TOKEN',    default='')
-TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER',  default='')
-
-# mpesa daraja
-MPESA_CONSUMER_KEY    = env('MPESA_CONSUMER_KEY',    default='')
-MPESA_CONSUMER_SECRET = env('MPESA_CONSUMER_SECRET', default='')
-MPESA_SHORTCODE       = env('MPESA_SHORTCODE',       default='174379')
-MPESA_PASSKEY         = env('MPESA_PASSKEY',         default='')
-MPESA_ENV             = env('MPESA_ENV',             default='sandbox')
-
-# stripe
-
-# openai
-OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
-
-# sentinel hub
-SENTINELHUB_CLIENT_ID     = env('SENTINELHUB_CLIENT_ID',     default='')
-SENTINELHUB_CLIENT_SECRET = env('SENTINELHUB_CLIENT_SECRET', default='')
-
-# gcp
-GCP_PROJECT_ID  = env('GCP_PROJECT_ID',  default='')
-GCP_PUBSUB_TOPIC = env('GCP_PUBSUB_TOPIC', default='agroshield-scans')
-
-# google credentials file path
-GOOGLE_APPLICATION_CREDENTIALS = str(BASE_DIR / 'service_account.json')
-
-# add satellite task to the schedule
-CELERY_BEAT_SCHEDULE['fetch-ndvi-every-5-days'] = {
-    'task':     'apps.satellite.tasks.fetch_ndvi_for_all_farms',
-    'schedule': crontab(minute=0, hour=0, day_of_week='*/5'),
-}
-
-# flutterwave - african payment gateway replacing stripe
-FLUTTERWAVE_PUBLIC_KEY    = env('FLUTTERWAVE_PUBLIC_KEY',    default='')
-FLUTTERWAVE_SECRET_KEY    = env('FLUTTERWAVE_SECRET_KEY',    default='')
-FLUTTERWAVE_ENCRYPTION_KEY = env('FLUTTERWAVE_ENCRYPTION_KEY', default='')
-
-# mpesa b2c security credential - encrypted initiator password
-MPESA_SECURITY_CREDENTIAL = env('MPESA_SECURITY_CREDENTIAL', default='')
-
-MPESA_SECURITY_CREDENTIAL = env('MPESA_SECURITY_CREDENTIAL', default='')
-
-# serve static files in development
-STATICFILES_DIRS = [BASE_DIR / 'static']
-
-# whitenoise serves static files efficiently
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# redirect to dashboard after google oauth login
-LOGIN_REDIRECT_URL  = '/dashboard/'
+# Redirects
+LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = env('ACCOUNT_DEFAULT_HTTP_PROTOCOL', default='http')
