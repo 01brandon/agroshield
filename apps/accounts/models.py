@@ -21,26 +21,26 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
 
     ROLE_CHOICES = [
-        ('farmer',     'Farmer'),
-        ('buyer',      'Buyer'),
-        ('agronomist', 'Agronomist'),
-        ('ngo',        'NGO / Government'),
-        ('admin',      'Admin'),
+        ('farmer',      'Farmer'),
+        ('buyer',       'Buyer'),
+        ('agronomist',  'Agronomist'),
+        ('ngo',         'NGO / Government'),
+        ('admin',       'Admin'),
     ]
 
-    email       = models.EmailField(unique=True)
-    first_name  = models.CharField(max_length=100)
-    last_name   = models.CharField(max_length=100)
-    phone       = models.CharField(max_length=20, blank=True)
-    role        = models.CharField(max_length=20, choices=ROLE_CHOICES, default='farmer')
-    avatar      = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    country     = models.CharField(max_length=100, blank=True)
-    language    = models.CharField(max_length=10, default='en')
-    is_verified = models.BooleanField(default=False)
-    is_active   = models.BooleanField(default=True)
-    is_staff    = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(auto_now_add=True)
-    updated_at  = models.DateTimeField(auto_now=True)
+    email           = models.EmailField(unique=True)
+    first_name      = models.CharField(max_length=100)
+    last_name       = models.CharField(max_length=100)
+    phone           = models.CharField(max_length=20, blank=True)
+    role            = models.CharField(max_length=20, choices=ROLE_CHOICES, default='farmer')
+    avatar          = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    country         = models.CharField(max_length=100, blank=True)
+    language        = models.CharField(max_length=10, default='en')
+    is_verified     = models.BooleanField(default=False)
+    is_active       = models.BooleanField(default=True)
+    is_staff        = models.BooleanField(default=False)
+    date_joined     = models.DateTimeField(auto_now_add=True)
+    updated_at      = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD  = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']

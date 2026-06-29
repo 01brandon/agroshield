@@ -36,6 +36,7 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount.providers.facebook',
     'dj_rest_auth',
     'dj_rest_auth.registration',
+    'rest_framework_simplejwt.token_blacklist',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
     'django_celery_beat',
