@@ -3,51 +3,22 @@
 {% block nav_forum %}active{% endblock %}
 {% block dash_title %}community forum{% endblock %}
 {% block dash_content %}
-
 <div class="forum-layout">
   <div class="forum-posts">
-    <div class="page-actions">
-      <button class="btn-primary" id="openNewPost">+ ask a question</button>
-    </div>
-    <div id="postsList">
-      <p class="loading-text">loading posts...</p>
-    </div>
+    <div class="page-actions"><button class="btn-primary" id="openNewPost">+ ask a question</button></div>
+    <div id="postsList"><p class="loading-text">loading...</p></div>
   </div>
-  <div class="forum-sidebar">
-    <div class="dash-card">
-      <h4>community stats</h4>
-      <p id="communityStats">loading...</p>
-    </div>
-  </div>
+  <div class="forum-sidebar"><div class="dash-card"><h4>community stats</h4><p id="communityStats">loading...</p></div></div>
 </div>
-
-<div class="modal-overlay" id="newPostModal">
-  <div class="modal">
-    <h3>ask the community</h3>
-    <form id="newPostForm">
-      <div class="form-group">
-        <label>title</label>
-        <input type="text" name="title" placeholder="what is your question?" required>
-      </div>
-      <div class="form-group">
-        <label>details</label>
-        <textarea name="body" rows="4" placeholder="describe your situation..." required></textarea>
-      </div>
-      <div class="form-group">
-        <label>crop tag (optional)</label>
-        <input type="text" name="crop_tag" placeholder="e.g. maize">
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn-outline" id="closeNewPost">cancel</button>
-        <button type="submit" class="btn-primary">post question</button>
-      </div>
-    </form>
-    <p class="form-error" id="postError"></p>
-  </div>
-</div>
-
+<div class="modal-overlay" id="newPostModal"><div class="modal"><h3>ask the community</h3>
+  <form id="newPostForm">
+    <div class="form-group"><label>title</label><input type="text" name="title" required></div>
+    <div class="form-group"><label>details</label><textarea name="body" rows="4" required></textarea></div>
+    <div class="form-group"><label>crop tag (optional)</label><input type="text" name="crop_tag"></div>
+    <div class="form-actions"><button type="button" class="btn-outline" id="closeNewPost">cancel</button><button type="submit" class="btn-primary">post question</button></div>
+  </form><p class="form-error" id="postError"></p>
+</div></div>
 {% endblock %}
-
 {% block extra_js %}
 <script src="/static/js/forum.js"></script>
 {% endblock %}

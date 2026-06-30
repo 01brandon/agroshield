@@ -3,24 +3,34 @@
 {% block nav_weather %}active{% endblock %}
 {% block dash_title %}weather intelligence{% endblock %}
 {% block dash_content %}
-
+<div class="page-actions"><button class="btn-primary" id="refreshWeatherBtn">refresh weather now</button></div>
 <div class="weather-layout">
-  <div class="weather-alerts-panel">
-    <h3>active alerts</h3>
-    <div id="alertsList">
-      <p class="loading-text">loading alerts...</p>
-    </div>
-  </div>
-  <div class="weather-readings-panel">
-    <h3>recent readings</h3>
-    <div id="readingsList">
-      <p class="loading-text">loading readings...</p>
-    </div>
-  </div>
+  <div class="weather-alerts-panel"><h3>active alerts</h3><div id="alertsList"><p class="loading-text">loading...</p></div></div>
+  <div class="weather-readings-panel"><h3>recent readings</h3><div id="readingsList"><p class="loading-text">loading...</p></div></div>
 </div>
-
 {% endblock %}
-
 {% block extra_js %}
-<script src="/static/js/weather.js"></script>
+<script>
+async function loadAlerts(){
+  const list=document.getElementById('alertsList');
+  const res=await apiFetch('/api/weather/alerts/'); if(!res||!res.ok){list.innerHTML='<p class="loading-text">could not load alerts.</p>';return;}
+  const data=await res.json(); const alerts=data.results||data; list.innerHTML='';
+  if(!alerts.length){list.innerHTML='<p class="loading-text">no alerts. all conditions normal.</p>';return;}
+  alerts.forEach(a=>{list.innerHTML+=`<div class="alert-item ${a.alert_type}"><strong>${a.alert_type.toUpperCase()} - severity ${a.severity}/5</strong><p style="font-size:13px;margin-top:4px">${a.message}</p></div>`;});
+}
+async function loadReadings(){
+  const list=document.getElementById('readingsList');
+  const res=await apiFetch('/api/weather/readings/'); if(!res||!res.ok){list.innerHTML='<p class="loading-text">could not load readings.</p>';return;}
+  const data=await res.json(); const readings=data.results||data; list.innerHTML='';
+  if(!readings.length){list.innerHTML='<p class="loading-text">no readings yet. click refresh weather above, or add a farm first.</p>';return;}
+  readings.forEach(r=>{list.innerHTML+=`<div class="reading-item"><strong>${r.description}</strong><p style="font-size:13px;color:#666">temp: ${r.temperature}c &bull; humidity: ${r.humidity}% &bull; wind: ${r.wind_speed}m/s</p></div>`;});
+}
+document.getElementById('refreshWeatherBtn').addEventListener('click', async (e)=>{
+  e.target.disabled=true; e.target.textContent='fetching...';
+  const res=await apiFetch('/api/weather/refresh/',{method:'POST'});
+  e.target.disabled=false; e.target.textContent='refresh weather now';
+  loadAlerts(); loadReadings();
+});
+document.addEventListener('DOMContentLoaded',()=>{loadAlerts();loadReadings();});
+</script>
 {% endblock %}

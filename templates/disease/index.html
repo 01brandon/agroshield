@@ -3,41 +3,94 @@
 {% block nav_disease %}active{% endblock %}
 {% block dash_title %}crop disease detection{% endblock %}
 {% block dash_content %}
-
 <div class="scan-layout">
   <div class="scan-upload-box">
-    <h3>submit a new crop scan</h3>
-    <p>upload a photo of your crop and our ai will diagnose any diseases</p>
+    <h3>scan your crop</h3>
+    <p>take a photo or upload an image and our ai diagnoses it instantly</p>
     <form id="scanForm">
-      <div class="form-group">
-        <label>select farm</label>
-        <select name="farm" id="scanFarmSelect" required>
-          <option value="">loading farms...</option>
-        </select>
+      <div class="form-group"><label>select farm</label>
+        <select name="farm" id="scanFarmSelect" required><option value="">loading farms...</option></select>
       </div>
-      <div class="form-group">
-        <label>cloudinary image url</label>
-        <input type="url" name="cloudinary_url" id="scanImageUrl" placeholder="https://res.cloudinary.com/..." required>
-        <small>upload your image to cloudinary.com first then paste the url here</small>
+      <div class="form-group"><label>crop photo</label>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="cropImageFile" accept="image/*" capture="environment" style="display:none">
+          <div id="uploadPlaceholder"><div style="font-size:42px">📷</div><p style="font-weight:600;color:#1a2e1a">tap to take a photo or upload</p><p style="font-size:12px;color:#888">jpg, png — max 10mb</p></div>
+          <img id="imagePreview" style="display:none;width:100%;border-radius:8px;max-height:260px;object-fit:cover">
+          <div id="uploadProgress" style="display:none;text-align:center;padding:16px"><div class="spinner"></div><p style="margin-top:10px;color:#666;font-size:13px">uploading...</p></div>
+        </div>
+        <input type="hidden" id="cloudinaryUrl" name="cloudinary_url">
       </div>
-      <div class="form-group">
-        <label>notes (optional)</label>
-        <textarea name="notes" rows="3" placeholder="describe what you are seeing..."></textarea>
-      </div>
-      <button type="submit" class="btn-primary">submit for diagnosis</button>
+      <div class="form-group"><label>notes (optional)</label><textarea name="notes" id="scanNotes" rows="2" placeholder="e.g. yellowing leaves, spots..."></textarea></div>
+      <button type="submit" class="btn-primary btn-full" id="scanSubmitBtn" disabled>analyse crop</button>
       <p class="form-error" id="scanError"></p>
     </form>
   </div>
-  <div class="scan-results">
-    <h3>recent scans</h3>
-    <div id="scansList">
-      <p class="loading-text">loading scans...</p>
-    </div>
-  </div>
+  <div class="scan-results"><h3>recent scan results</h3><div id="scansList"><p class="loading-text">loading...</p></div></div>
 </div>
-
+<style>
+.upload-area{border:2px dashed #c8ddb8;border-radius:12px;padding:28px 16px;text-align:center;cursor:pointer;background:#f8fbf4;min-height:160px;display:flex;align-items:center;justify-content:center}
+.upload-area:hover{border-color:#7ab648}
+.spinner{width:32px;height:32px;border:3px solid #e0ede0;border-top-color:#7ab648;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-card{background:#fff;border:1px solid #e8ede8;border-radius:12px;padding:18px;margin-bottom:12px}
+.result-card .disease-name{font-size:16px;font-weight:700;color:#1a2e1a;margin-bottom:4px}
+.result-image{width:100%;height:130px;object-fit:cover;border-radius:8px;margin-bottom:12px}
+.confidence-bar{height:6px;background:#e0ede0;border-radius:3px;margin:6px 0 12px}
+.confidence-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#7ab648,#4a7c3f)}
+</style>
 {% endblock %}
-
 {% block extra_js %}
-<script src="/static/js/disease.js"></script>
+<script>
+const CLOUD_NAME = '{{ cloudinary_cloud_name|default:"" }}';
+const uploadArea=document.getElementById('uploadArea'),fileInput=document.getElementById('cropImageFile'),placeholder=document.getElementById('uploadPlaceholder'),preview=document.getElementById('imagePreview'),progress=document.getElementById('uploadProgress'),urlInput=document.getElementById('cloudinaryUrl'),submitBtn=document.getElementById('scanSubmitBtn'),scanError=document.getElementById('scanError');
+uploadArea.addEventListener('click',()=>fileInput.click());
+fileInput.addEventListener('change', async (e)=>{
+  const file=e.target.files[0]; if(!file) return;
+  placeholder.style.display='none'; preview.style.display='none'; progress.style.display='block'; submitBtn.disabled=true; scanError.textContent='';
+  try{
+    const fd=new FormData(); fd.append('file',file); fd.append('upload_preset','agroshield_unsigned'); fd.append('folder','agroshield/scans');
+    const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,{method:'POST',body:fd});
+    const data=await res.json();
+    if(data.secure_url){
+      urlInput.value=data.secure_url; preview.src=data.secure_url; preview.style.display='block'; progress.style.display='none'; submitBtn.disabled=false;
+    } else throw new Error(data.error?.message||'upload failed - check cloudinary upload preset exists');
+  }catch(err){
+    progress.style.display='none'; placeholder.style.display='flex';
+    scanError.textContent='upload failed: '+err.message;
+  }
+});
+async function loadFarmsDropdown(){
+  const res=await apiFetch('/api/farms/'); if(!res||!res.ok) return;
+  const data=await res.json(); const farms=data.results||data;
+  const sel=document.getElementById('scanFarmSelect');
+  sel.innerHTML = farms.length ? farms.map(f=>`<option value="${f.id}">${f.name} (${f.primary_crop})</option>`).join('') : '<option value="">add a farm first</option>';
+}
+document.getElementById('scanForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const farm=document.getElementById('scanFarmSelect').value, url=urlInput.value, notes=document.getElementById('scanNotes').value;
+  if(!url){scanError.textContent='upload a photo first';return;}
+  if(!farm){scanError.textContent='select a farm';return;}
+  submitBtn.disabled=true; submitBtn.textContent='analysing...';
+  const res=await apiFetch('/api/disease/',{method:'POST',body:JSON.stringify({farm,cloudinary_url:url,notes})});
+  if(res&&res.ok){
+    fileInput.value=''; urlInput.value=''; preview.style.display='none'; placeholder.style.display='flex';
+    submitBtn.textContent='analyse crop'; submitBtn.disabled=true;
+    loadScans();
+  }else if(res){
+    const data=await res.json(); scanError.textContent=Object.values(data).flat().join(' ');
+    submitBtn.textContent='analyse crop'; submitBtn.disabled=false;
+  }
+});
+async function loadScans(){
+  const list=document.getElementById('scansList');
+  const res=await apiFetch('/api/disease/'); if(!res||!res.ok){list.innerHTML='<p class="loading-text">could not load scans.</p>';return;}
+  const data=await res.json(); const scans=data.results||data; list.innerHTML='';
+  if(!scans.length){list.innerHTML='<p class="loading-text">no scans yet. take your first photo above.</p>';return;}
+  scans.forEach(scan=>{
+    const conf=Math.round((scan.confidence_score||0)*100);
+    list.innerHTML+=`<div class="result-card">${scan.cloudinary_url?`<img src="${scan.cloudinary_url}" class="result-image">`:''}<div class="disease-name">${scan.disease_detected||'awaiting diagnosis'}</div><div style="font-size:12px;color:#888">confidence: ${conf}% &bull; ${scan.status}<div class="confidence-bar"><div class="confidence-fill" style="width:${conf}%"></div></div></div>${scan.treatment_advice?`<div style="font-size:13px;color:#444"><strong>treatment:</strong> ${scan.treatment_advice}</div>`:''}</div>`;
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>{loadFarmsDropdown();loadScans();setInterval(loadScans,8000);});
+</script>
 {% endblock %}
