@@ -9,51 +9,22 @@ from .serializers import RegisterSerializer, UserSerializer, ChangePasswordSeria
 
 User = get_user_model()
 
-def _cloudinary_context():
+def _ctx():
     return {'cloudinary_cloud_name': settings.CLOUDINARY_STORAGE.get('CLOUD_NAME', '')}
 
-def landing(request):
-    return render(request, 'index.html')
-
-def login_page(request):
-    return render(request, 'login.html')
-
-def register_page(request):
-    return render(request, 'register.html')
-
-def dashboard_home(request):
-    return render(request, 'dashboard/index.html', _cloudinary_context())
-
-def farms_page(request):
-    return render(request, 'farms/index.html', _cloudinary_context())
-
-def disease_page(request):
-    return render(request, 'disease/index.html', _cloudinary_context())
-
-def weather_page(request):
-    return render(request, 'weather/index.html', _cloudinary_context())
-
-def marketplace_page(request):
-    return render(request, 'marketplace/index.html', _cloudinary_context())
-
-def forum_page(request):
-    return render(request, 'forum/index.html', _cloudinary_context())
-
-    return render(request, 'academy/index.html', _cloudinary_context())
-
-def finance_page(request):
-    return render(request, 'dashboard/finance.html', _cloudinary_context())
-
-    return render(request, 'dashboard/insurance.html', _cloudinary_context())
-
-def carbon_page(request):
-    return render(request, 'dashboard/carbon.html', _cloudinary_context())
-
-def about_page(request):
-    return render(request, 'about.html')
-
-def contact_page(request):
-    return render(request, 'contact.html')
+def landing(request):         return render(request, 'index.html')
+def login_page(request):      return render(request, 'login.html')
+def register_page(request):   return render(request, 'register.html')
+def about_page(request):      return render(request, 'about.html')
+def contact_page(request):    return render(request, 'contact.html')
+def dashboard_home(request):  return render(request, 'dashboard/index.html', _ctx())
+def farms_page(request):      return render(request, 'farms/index.html', _ctx())
+def disease_page(request):    return render(request, 'disease/index.html', _ctx())
+def weather_page(request):    return render(request, 'weather/index.html', _ctx())
+def marketplace_page(request):return render(request, 'marketplace/index.html', _ctx())
+def forum_page(request):      return render(request, 'forum/index.html', _ctx())
+def finance_page(request):    return render(request, 'dashboard/finance.html', _ctx())
+def carbon_page(request):     return render(request, 'dashboard/carbon.html', _ctx())
 
 
 class RegisterView(generics.CreateAPIView):
@@ -72,16 +43,15 @@ class RegisterView(generics.CreateAPIView):
             'access':  str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
 
+
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class   = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    def get_object(self): return self.request.user
 
-    def get_object(self):
-        return self.request.user
 
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -92,9 +62,9 @@ class ChangePasswordView(APIView):
         user.save()
         return Response({'message': 'password updated successfully'})
 
+
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-
     def post(self, request):
         try:
             token = RefreshToken(request.data['refresh'])
