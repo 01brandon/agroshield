@@ -39,13 +39,11 @@ def marketplace_page(request):
 def forum_page(request):
     return render(request, 'forum/index.html', _cloudinary_context())
 
-def academy_page(request):
     return render(request, 'academy/index.html', _cloudinary_context())
 
 def finance_page(request):
     return render(request, 'dashboard/finance.html', _cloudinary_context())
 
-def insurance_page(request):
     return render(request, 'dashboard/insurance.html', _cloudinary_context())
 
 def carbon_page(request):

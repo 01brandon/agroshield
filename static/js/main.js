@@ -34,3 +34,11 @@ window.addEventListener('scroll', () => {
     nav.style.background = 'rgba(10,20,10,.85)';
   }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const signInBtn = document.querySelector('.nav-actions a.btn-primary');
+  if (signInBtn && localStorage.getItem('access')) {
+    signInBtn.textContent = 'dashboard';
+    signInBtn.href = '/dashboard/';
+  }
+});

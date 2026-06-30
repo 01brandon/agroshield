@@ -6,7 +6,6 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 from apps.accounts.views import (
     landing, login_page, register_page, dashboard_home,
     farms_page, disease_page, weather_page, marketplace_page,
-    forum_page, academy_page, finance_page, insurance_page, carbon_page,
     about_page, contact_page,
 )
 
@@ -26,9 +25,7 @@ urlpatterns = [
     path('dashboard/weather/',      weather_page,      name='weather-page'),
     path('dashboard/marketplace/',  marketplace_page,  name='marketplace-page'),
     path('dashboard/forum/',        forum_page,        name='forum-page'),
-    path('dashboard/academy/',      academy_page,      name='academy-page'),
     path('dashboard/finance/',      finance_page,      name='finance-page'),
-    path('dashboard/insurance/',    insurance_page,    name='insurance-page'),
     path('dashboard/carbon/',       carbon_page,       name='carbon-page'),
 
     # allauth handles google oauth flow
@@ -48,11 +45,9 @@ urlpatterns = [
     path('api/seeds/',              include('apps.seeds.urls')),
     path('api/cooperatives/',       include('apps.cooperatives.urls')),
     path('api/livestock/',          include('apps.livestock.urls')),
-    path('api/insurance/',          include('apps.insurance.urls')),
     path('api/soil/',               include('apps.soil.urls')),
     path('api/satellite/',          include('apps.satellite.urls')),
     path('api/forum/',              include('apps.forum.urls')),
-    path('api/academy/',            include('apps.academy.urls')),
     path('api/traceability/',       include('apps.traceability.urls')),
     path('api/carbon/',             include('apps.carbon.urls')),
     path('api/drones/',             include('apps.drones.urls')),
