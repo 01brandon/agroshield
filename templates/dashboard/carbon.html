@@ -3,101 +3,117 @@
 {% block nav_carbon %}active{% endblock %}
 {% block dash_title %}carbon credits{% endblock %}
 {% block dash_content %}
+
 <div class="page-actions">
-  <button class="btn-primary" id="openLogActivity">+ log sustainable activity</button>
-</div>
-<div class="dash-card">
-  <h3>my carbon activities</h3>
-  <div id="carbonList"><p class="loading-text">loading...</p></div>
+  <button class="btn-primary" id="openCarbonModal">+ log sustainable activity</button>
 </div>
 
-<div class="modal-overlay" id="logActivityModal">
-  <div class="modal">
-    <h3>log sustainable activity</h3>
-    <form id="logActivityForm">
-      <div class="form-group">
-        <label>farm</label>
-        <select id="carbonFarmSelect" name="farm"><option>loading...</option></select>
-      </div>
-      <div class="form-group">
-        <label>practice</label>
-        <select name="practice">
-          <option value="cover_crop">cover cropping</option>
-          <option value="agroforestry">agroforestry</option>
-          <option value="no_till">no-till farming</option>
-          <option value="composting">composting</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>area (hectares)</label>
-          <input type="number" name="area_hectares" step="0.1" required>
-        </div>
-        <div class="form-group">
-          <label>estimated tonnes co2</label>
-          <input type="number" name="estimated_tonnes" step="0.1" required>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn-outline" id="closeLogActivity">cancel</button>
-        <button type="submit" class="btn-primary">save activity</button>
-      </div>
-    </form>
+<div class="dash-grid">
+  <div class="dash-card">
+    <h3>my carbon activities</h3>
+    <div id="carbonList"><p class="loading-text">loading...</p></div>
+  </div>
+  <div class="dash-card">
+    <h3>carbon summary</h3>
+    <div id="carbonSummary"><p class="loading-text">loading...</p></div>
   </div>
 </div>
+
+<div class="modal-overlay" id="carbonModal">
+  <div class="modal">
+    <h3>log sustainable activity</h3>
+    <form id="carbonForm">
+      <div class="form-group"><label>farm</label>
+        <select name="farm" id="carbonFarmSelect" required><option value="">loading...</option></select>
+      </div>
+      <div class="form-group"><label>practice</label>
+        <select name="practice" required>
+          <option value="cover_crop">cover cropping (0.3 tonnes CO2/ha/yr)</option>
+          <option value="agroforestry">agroforestry (2.5 tonnes CO2/ha/yr)</option>
+          <option value="no_till">no-till farming (0.5 tonnes CO2/ha/yr)</option>
+          <option value="composting">composting (0.8 tonnes CO2/ha/yr)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>area (hectares)</label>
+        <input type="number" name="area_hectares" step="0.01" min="0.1" required placeholder="e.g. 5.5">
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-outline" onclick="document.getElementById('carbonModal').classList.remove('open')">cancel</button>
+        <button type="submit" class="btn-primary">log activity</button>
+      </div>
+    </form>
+    <p class="form-error" id="carbonError"></p>
+  </div>
+</div>
+
 {% endblock %}
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
-  loadCarbonActivities();
-
-  // load farms into dropdown
-  const farmsRes = await apiFetch('/api/farms/');
-  if (farmsRes && farmsRes.ok) {
-    const data  = await farmsRes.json();
-    const farms = data.results || data;
-    document.getElementById('carbonFarmSelect').innerHTML = farms.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
-  }
-
-  document.getElementById('openLogActivity').addEventListener('click', () => {
-    document.getElementById('logActivityModal').classList.add('open');
-  });
-
-  document.getElementById('closeLogActivity').addEventListener('click', () => {
-    document.getElementById('logActivityModal').classList.remove('open');
-  });
-
-  document.getElementById('logActivityForm').addEventListener('submit', async (e) => {
+  loadCarbon();
+  loadFarms();
+  document.getElementById('openCarbonModal').addEventListener('click', () =>
+    document.getElementById('carbonModal').classList.add('open'));
+  document.getElementById('carbonForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const form = e.target;
-    const res  = await apiFetch('/api/carbon/', {
-      method: 'POST',
-      body:   JSON.stringify({
-        farm:             form.farm.value,
-        practice:         form.practice.value,
-        area_hectares:    form.area_hectares.value,
-        estimated_tonnes: form.estimated_tonnes.value,
-      }),
-    });
+    const form = e.target, error = document.getElementById('carbonError');
+    error.textContent = '';
+    const body = {farm: form.farm.value, practice: form.practice.value, area_hectares: form.area_hectares.value};
+    const res = await apiFetch('/api/carbon/', {method: 'POST', body: JSON.stringify(body)});
     if (res && res.ok) {
-      document.getElementById('logActivityModal').classList.remove('open');
-      form.reset();
-      loadCarbonActivities();
+      document.getElementById('carbonModal').classList.remove('open');
+      form.reset(); loadCarbon();
+    } else if (res) {
+      const data = await res.json(); error.textContent = Object.values(data).flat().join(' ');
     }
   });
 });
 
-async function loadCarbonActivities() {
-  const res  = await apiFetch('/api/carbon/');
-  if (!res || !res.ok) return;
-  const data       = await res.json();
-  const activities = data.results || data;
-  const list       = document.getElementById('carbonList');
-  list.innerHTML   = '';
+async function loadFarms() {
+  const res = await apiFetch('/api/farms/'); if (!res || !res.ok) return;
+  const data = await res.json(); const farms = data.results || data;
+  document.getElementById('carbonFarmSelect').innerHTML = farms.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+}
+
+async function loadCarbon() {
+  const list = document.getElementById('carbonList');
+  const summary = document.getElementById('carbonSummary');
+  list.innerHTML = '<p class="loading-text">loading...</p>';
+  const res = await apiFetch('/api/carbon/'); if (!res || !res.ok) {list.innerHTML = '<p class="loading-text">could not load.</p>'; return;}
+  const data = await res.json(); const activities = data.results || data;
+  list.innerHTML = '';
+  if (!activities.length) {list.innerHTML = '<p class="loading-text">no activities logged yet. click above to start earning credits.</p>'; return;}
+
+  let totalTonnes = 0;
   activities.forEach(a => {
-    list.innerHTML += `<div class="scan-item"><h5>${a.practice.replace('_',' ')} <span class="badge badge-${a.verified ? 'confirmed' : 'pending'}">${a.verified ? 'verified' : 'pending'}</span></h5><p>${a.area_hectares} ha &bull; ${a.estimated_tonnes} tonnes co2</p></div>`;
+    totalTonnes += parseFloat(a.estimated_tonnes || 0);
+    const badgeColor = a.verified ? '#4a7c3f' : '#e6a817';
+    const badgeText  = a.verified ? 'verified' : 'pending';
+    list.innerHTML += `<div class="scan-item">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>${a.practice.replace('_', ' ')}</strong>
+        <span style="background:${badgeColor};color:#fff;border-radius:20px;padding:2px 10px;font-size:11px">${badgeText}</span>
+      </div>
+      <p style="font-size:13px;color:#666;margin-top:4px">${a.area_hectares} ha &bull; <strong>${a.estimated_tonnes} tonnes CO2</strong> sequestered per year</p>
+      ${a.verified ? `<p style="font-size:12px;color:#4a7c3f;margin-top:4px">equivalent to ${Math.round(a.estimated_tonnes * 8.5)} trees planted annually</p>` : ''}
+    </div>`;
   });
-  if (!activities.length) list.innerHTML = '<p class="loading-text">no activities logged yet.</p>';
+
+  summary.innerHTML = `
+    <div class="dash-stat" style="margin:0 0 16px">
+      <p class="stat-label">total CO2 sequestered</p>
+      <h2 class="stat-value">${totalTonnes.toFixed(2)} t</h2>
+    </div>
+    <div class="dash-stat" style="margin:0 0 16px">
+      <p class="stat-label">verified activities</p>
+      <h2 class="stat-value">${activities.filter(a=>a.verified).length} / ${activities.length}</h2>
+    </div>
+    <div class="dash-stat">
+      <p class="stat-label">estimated market value</p>
+      <h2 class="stat-value">ksh ${Math.round(totalTonnes * 1200).toLocaleString()}</h2>
+    </div>
+    <p style="font-size:12px;color:#888;margin-top:12px">based on current carbon price of ksh 1,200 per tonne CO2</p>
+  `;
 }
 </script>
 {% endblock %}
