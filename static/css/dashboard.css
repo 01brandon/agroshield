@@ -153,3 +153,23 @@
   width:100%;
   max-width:460px;
 }
+
+/* ── dashboard mobile responsive ── */
+@media (max-width: 768px) {
+  .dash-body { flex-direction: column }
+  .sidebar {
+    width: 100%; height: auto; position: relative;
+    flex-direction: row; padding: 10px 16px;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  }
+  .sidebar-logo { margin-bottom: 0; margin-right: 12px }
+  .sidebar-nav { display: flex; flex-wrap: wrap; gap: 4px; flex: 1 }
+  .sidebar-nav .nav-item { padding: 5px 10px; font-size: 11px }
+  .sidebar-bottom { display: flex; gap: 6px }
+  .dash-main { width: 100%; min-height: calc(100vh - 80px) }
+  .dash-grid { grid-template-columns: 1fr }
+  .stats-row { grid-template-columns: 1fr 1fr }
+  .scan-layout { grid-template-columns: 1fr }
+  .weather-layout { grid-template-columns: 1fr }
+  .forum-layout { grid-template-columns: 1fr }
+}

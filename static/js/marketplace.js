@@ -193,3 +193,53 @@ async function releaseEscrow(id) {
   const res = await apiFetch(`/api/marketplace/escrow/${id}/release/`, { method: 'POST' });
   if (res && res.ok) loadEscrow();
 }
+
+async function loadEscrow() {
+  const list = document.getElementById('escrowList');
+  list.innerHTML = '<p class="loading-text">loading...</p>';
+  const res = await apiFetch('/api/marketplace/escrow/');
+  if (!res || !res.ok) { list.innerHTML = '<p class="loading-text">could not load escrow.</p>'; return; }
+  const data = await res.json(); const escrows = data.results || data;
+  if (!escrows.length) { list.innerHTML = '<p class="loading-text">no escrow transactions. accept a bid to create one.</p>'; return; }
+  list.innerHTML = escrows.map(e => {
+    const statusColors = {pending:'#e6a817', held:'#4a7c3f', released:'#888', disputed:'#e05252'};
+    const color = statusColors[e.status] || '#888';
+    let actions = '';
+    if (e.status === 'pending') {
+      actions = `<p style="font-size:12px;color:#666;margin-top:8px">buyer needs to pay ksh ${e.amount} via m-pesa to release funds into escrow.</p>
+        <button onclick="payEscrow(${e.id})" class="btn-primary" style="font-size:12px;padding:6px 14px;margin-top:6px">pay with m-pesa</button>`;
+    } else if (e.status === 'held') {
+      actions = `<p style="font-size:12px;color:#4a7c3f;margin-top:8px">payment held in escrow. release to seller after delivery.</p>
+        <button onclick="releaseEscrow(${e.id})" class="btn-primary" style="font-size:12px;padding:6px 14px;margin-top:6px">confirm delivery &amp; release funds</button>`;
+    } else if (e.status === 'released') {
+      actions = `<p style="font-size:12px;color:#888;margin-top:8px">funds released to seller. transaction complete.</p>`;
+    }
+    return `<div class="scan-item">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>ksh ${e.amount}</strong>
+        <span style="background:${color};color:#fff;border-radius:20px;padding:3px 10px;font-size:11px">${e.status}</span>
+      </div>
+      ${actions}
+    </div>`;
+  }).join('');
+}
+
+async function payEscrow(id) {
+  const phone = prompt('enter your m-pesa phone number (e.g. 0712345678):');
+  if (!phone) return;
+  const res = await apiFetch(`/api/marketplace/escrow/${id}/pay/`, {method:'POST', body: JSON.stringify({phone})});
+  if (res && res.ok) {
+    const data = await res.json();
+    alert(data.message || 'check your phone and enter your m-pesa pin');
+    loadEscrow();
+  } else if (res) {
+    const data = await res.json();
+    alert(data.error || 'payment initiation failed');
+  }
+}
+
+async function releaseEscrow(id) {
+  if (!confirm('confirm delivery and release funds to seller?')) return;
+  const res = await apiFetch(`/api/marketplace/escrow/${id}/release/`, {method:'POST'});
+  if (res && res.ok) { alert('funds released to seller successfully'); loadEscrow(); }
+}

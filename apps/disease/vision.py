@@ -1,16 +1,20 @@
-import requests, base64
+import base64, requests
 from django.conf import settings
 
 def analyse_crop_image(image_url):
     api_key = getattr(settings, 'GEMINI_API_KEY', '')
-    if not api_key:
-        return _fallback('gemini api key not configured — add GEMINI_API_KEY to your environment variables')
+
+    if not api_key or 'your_gemini' in api_key:
+        return _fallback('gemini api key not configured')
+
     try:
         img_res = requests.get(image_url, timeout=15)
         if img_res.status_code != 200:
-            return _fallback('could not download image for analysis')
+            return _fallback('could not download image')
+
         encoded   = base64.b64encode(img_res.content).decode('utf-8')
         mime_type = img_res.headers.get('content-type', 'image/jpeg').split(';')[0]
+
         payload = {
             'contents': [{
                 'parts': [
@@ -22,57 +26,58 @@ def analyse_crop_image(image_url):
                     },
                     {
                         'text': (
-                            'you are an expert plant pathologist. analyse this crop image carefully.\n\n'
-                            'respond in this exact format and nothing else:\n'
-                            'DISEASE: <name of disease, pest, deficiency, or "Healthy Crop">\n'
-                            'CONFIDENCE: <number 0-100>\n'
-                            'CAUSE: <one sentence explaining what caused this>\n'
-                            'TREATMENT: <specific actionable chemical treatment with dosage>\n'
-                            'ORGANIC: <specific organic or natural alternative treatment>\n\n'
-                            'if the image is not a plant, respond with DISEASE: Not a Plant Image and leave other fields empty.'
+                            'you are an expert plant pathologist. look at this crop image carefully and diagnose it.\n'
+                            'respond in EXACTLY this format and nothing else:\n'
+                            'DISEASE: <specific disease name, pest, deficiency, or "Healthy Crop" or "Not a Plant">\n'
+                            'CONFIDENCE: <number between 0 and 100>\n'
+                            'CAUSE: <one sentence explaining the cause>\n'
+                            'TREATMENT: <specific chemical treatment with exact dosage and timing>\n'
+                            'ORGANIC: <specific organic or natural alternative with method>\n'
                         )
                     }
                 ]
             }],
             'generationConfig': {
-                'maxOutputTokens': 600,
-                'temperature':     0.2,
+                'temperature':     0.1,
+                'maxOutputTokens': 500,
             }
         }
+
         res = requests.post(
-            f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key={api_key}',
-            headers = {'Content-Type': 'application/json'},
+            f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}',
             json    = payload,
+            headers = {'Content-Type': 'application/json'},
             timeout = 40,
         )
+
         if res.status_code == 200:
-            data = res.json()
-            text = data['candidates'][0]['content']['parts'][0]['text']
-            return _parse_response(text)
-        print(f'gemini vision error: {res.status_code} {res.text}')
-        return _fallback(f'gemini api returned {res.status_code}')
+            text = res.json()['candidates'][0]['content']['parts'][0]['text']
+            return _parse(text)
+
+        return _fallback(f'gemini returned {res.status_code}: {res.text[:120]}')
+
     except Exception as e:
-        print(f'gemini vision exception: {e}')
         return _fallback(str(e))
 
-def _parse_response(text):
-    lines = {}
+
+def _parse(text):
+    data = {}
     for line in text.strip().split('\n'):
         if ':' in line:
-            key, _, val = line.partition(':')
-            lines[key.strip().upper()] = val.strip()
-    disease    = lines.get('DISEASE', 'Unidentified Condition')
-    confidence = int(lines.get('CONFIDENCE', '70').replace('%', '').strip()) / 100
-    treatment  = lines.get('TREATMENT', 'consult a local agronomist for treatment advice.')
-    organic    = lines.get('ORGANIC', '')
-    status     = 'confirmed' if confidence >= 0.70 else 'pending'
+            k, _, v = line.partition(':')
+            data[k.strip().upper()] = v.strip()
+
+    raw_conf = ''.join(filter(lambda c: c.isdigit() or c == '.', data.get('CONFIDENCE', '75')))
+    conf     = float(raw_conf or '75') / 100
+
     return {
-        'disease_detected': disease,
-        'confidence_score': round(min(confidence, 1.0), 2),
-        'treatment_advice': treatment,
-        'organic_alt':      organic,
-        'status':           status,
+        'disease_detected': data.get('DISEASE', 'Unidentified Condition'),
+        'confidence_score': round(min(conf, 1.0), 2),
+        'treatment_advice': data.get('TREATMENT', 'consult a local agronomist for advice.'),
+        'organic_alt':      data.get('ORGANIC', ''),
+        'status':           'confirmed' if conf >= 0.65 else 'pending',
     }
+
 
 def _fallback(reason):
     return {

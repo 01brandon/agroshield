@@ -42,3 +42,41 @@ document.addEventListener('DOMContentLoaded', () => {
     signInBtn.href = '/dashboard/';
   }
 });
+
+// scroll animations
+document.addEventListener('DOMContentLoaded', () => {
+  // add fade-up to key sections
+  document.querySelectorAll('.feature-card, .step, .stat-card, .faq-item, .partner-logo').forEach((el, i) => {
+    el.classList.add('fade-up');
+    if (i % 3 === 1) el.classList.add('fade-up-delay-1');
+    if (i % 3 === 2) el.classList.add('fade-up-delay-2');
+  });
+  document.querySelectorAll('.stats-text, .stats-cards, .faq-left, .faq-list, .cta-inner').forEach(el => {
+    el.classList.add('fade-up');
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // mobile nav toggle
+  const toggle = document.getElementById('navToggle');
+  const links  = document.querySelector('.nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', () => links.classList.toggle('open'));
+  }
+
+  // navbar shows dashboard if logged in
+  const signInBtn = document.querySelector('.nav-actions a.btn-primary');
+  if (signInBtn && localStorage.getItem('access')) {
+    signInBtn.textContent = 'dashboard';
+    signInBtn.href = '/dashboard/';
+  }
+});

@@ -130,3 +130,39 @@ img{max-width:100%;display:block}
   .features-grid,.steps-grid,.stats-cards{grid-template-columns:1fr}
   .footer-grid{grid-template-columns:1fr}
 }
+
+/* ── mobile responsive ── */
+@media (max-width: 768px) {
+  .nav-links { display: none }
+  .nav-toggle { display: block !important }
+  .hero-content { padding: 0 20px }
+  .hero-content h1 { font-size: 32px }
+  .features-grid { grid-template-columns: 1fr }
+  .stats-grid { grid-template-columns: 1fr }
+  .stats-cards { grid-template-columns: 1fr 1fr }
+  .steps-grid { grid-template-columns: 1fr }
+  .faq-inner { grid-template-columns: 1fr }
+  .footer-grid { grid-template-columns: 1fr 1fr }
+  .auth-card { margin: 20px; padding: 28px 20px }
+  .auth-card .form-row { grid-template-columns: 1fr }
+}
+
+@media (max-width: 480px) {
+  .stats-cards { grid-template-columns: 1fr }
+  .footer-grid { grid-template-columns: 1fr }
+  .hero-content h1 { font-size: 26px }
+}
+
+/* ── scroll animations ── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.fade-up-delay-1 { transition-delay: 0.1s }
+.fade-up-delay-2 { transition-delay: 0.2s }
+.fade-up-delay-3 { transition-delay: 0.3s }
