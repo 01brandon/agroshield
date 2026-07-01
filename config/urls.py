@@ -3,10 +3,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from apps.accounts.search_views import global_search
 from apps.accounts.views import (
     landing, login_page, register_page, dashboard_home,
     farms_page, disease_page, weather_page, marketplace_page,
-    forum_page, finance_page, carbon_page, about_page, contact_page,
+    forum_page, finance_page, carbon_page, about_page, contact_page, account_page,
 )
 
 urlpatterns = [
@@ -24,8 +25,10 @@ urlpatterns = [
     path('dashboard/marketplace/',  marketplace_page,  name='marketplace-page'),
     path('dashboard/forum/',        forum_page,        name='forum-page'),
     path('dashboard/finance/',      finance_page,      name='finance-page'),
+    path('dashboard/account/', account_page, name='account-page'),
     path('dashboard/carbon/',       carbon_page,       name='carbon-page'),
     path('accounts/',               include('allauth.urls')),
+    path('api/search/', global_search, name='global-search'),
     path('admin/',                  admin.site.urls),
     path('api/schema/',             SpectacularAPIView.as_view(),                       name='schema'),
     path('api/schema/swagger-ui/',  SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

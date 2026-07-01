@@ -72,3 +72,7 @@ class LogoutView(APIView):
             return Response({'message': 'logged out successfully'})
         except Exception:
             return Response({'error': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def account_page(request):
+    return render(request, 'dashboard/account.html', _ctx())

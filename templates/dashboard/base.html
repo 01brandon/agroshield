@@ -23,6 +23,7 @@
     <a href="/dashboard/carbon/"      class="nav-item {% block nav_carbon %}{% endblock %}">carbon credits</a>
   </nav>
   <div class="sidebar-bottom">
+    <a href="/dashboard/account/" class="nav-item">account settings</a>
     <a href="/" class="nav-item">home</a>
     <a href="#" class="nav-item" onclick="logout()">logout</a>
   </div>
@@ -30,12 +31,46 @@
 <main class="dash-main">
   <header class="dash-header">
     <div class="dash-header-left"><h1 class="dash-title">{% block dash_title %}overview{% endblock %}</h1></div>
+    <div class="dash-header-center" style="flex:1;max-width:400px;margin:0 24px;position:relative">
+      <input type="text" id="globalSearch" placeholder="search farms, posts, listings..."
+        style="width:100%;padding:8px 14px;border:1px solid #e0ede0;border-radius:50px;font-size:13px;background:#f8fbf4;outline:none">
+      <div id="searchResults" style="display:none;position:absolute;top:42px;left:0;right:0;background:#fff;border:1px solid #e0ede0;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);z-index:999;max-height:300px;overflow-y:auto"></div>
+    </div>
     <div class="dash-header-right"><span class="dash-user" id="dashUser">loading...</span></div>
   </header>
   <div class="dash-content">{% block dash_content %}{% endblock %}</div>
 </main>
 <script src="{% static 'js/auth.js' %}"></script>
 <script src="{% static 'js/dashboard.js' %}"></script>
+<script>
+// global search
+let searchTimer;
+document.getElementById('globalSearch').addEventListener('input', (e)=>{
+  clearTimeout(searchTimer);
+  const q = e.target.value.trim();
+  const box = document.getElementById('searchResults');
+  if(q.length < 2){ box.style.display='none'; return; }
+  searchTimer = setTimeout(async ()=>{
+    const res = await apiFetch(`/api/search/?q=${encodeURIComponent(q)}`);
+    if(!res||!res.ok){ box.style.display='none'; return; }
+    const data = await res.json();
+    if(!data.results.length){ box.style.display='none'; return; }
+    box.innerHTML = data.results.map(r=>`
+      <a href="${r.url}" style="display:block;padding:10px 16px;border-bottom:1px solid #f5f5f5;text-decoration:none;color:inherit">
+        <span style="font-size:10px;color:#7ab648;text-transform:uppercase;font-weight:700">${r.type}</span>
+        <p style="font-size:13px;font-weight:600;color:#1a2e1a;margin:2px 0">${r.title}</p>
+        <p style="font-size:12px;color:#888;margin:0">${r.subtitle}</p>
+      </a>`).join('');
+    box.style.display='block';
+  }, 300);
+});
+
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('#globalSearch')&&!e.target.closest('#searchResults')){
+    document.getElementById('searchResults').style.display='none';
+  }
+});
+</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

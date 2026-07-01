@@ -22,59 +22,72 @@
 async function loadAlerts(){
   const list=document.getElementById('alertsList');
   const res=await apiFetch('/api/weather/alerts/');
-  if(!res||!res.ok){list.innerHTML='<p class="loading-text">could not load alerts.</p>';return;}
-  const data=await res.json(); const alerts=data.results||data; list.innerHTML='';
-  if(!alerts.length){list.innerHTML='<p class="loading-text">no alerts. all conditions normal.</p>';return;}
-  alerts.forEach(a=>{
-    const colours={heat:'#e05252',frost:'#5296e0',drought:'#e08c52',pest:'#a052e0',flood:'#5296e0'};
-    list.innerHTML+=`<div class="alert-item" style="background:${colours[a.alert_type]||'#888'}15;border-left:4px solid ${colours[a.alert_type]||'#888'};border-radius:8px;padding:12px 14px;margin-bottom:10px">
-      <strong style="color:${colours[a.alert_type]||'#888'}">${a.alert_type.toUpperCase()} — severity ${a.severity}/5</strong>
-      ${a.farm_name?`<span style="font-size:12px;color:#888;margin-left:8px">${a.farm_name}</span>`:''}
+  if(!res||!res.ok){list.innerHTML='<p class="loading-text">no alerts.</p>';return;}
+  const alerts=(await res.json()).results||[];
+  list.innerHTML=alerts.length?alerts.map(a=>`
+    <div style="background:#fff;border-left:4px solid #e05252;border-radius:8px;padding:12px 14px;margin-bottom:10px">
+      <strong>${a.alert_type.toUpperCase()} — severity ${a.severity}/5</strong>
+      <span style="font-size:12px;color:#888;margin-left:8px">${a.farm_name||''}</span>
       <p style="font-size:13px;margin-top:6px;color:#444">${a.message}</p>
-    </div>`;
-  });
+    </div>`).join(''):'<p class="loading-text">no alerts. all conditions normal.</p>';
 }
 
 async function loadReadings(){
   const list=document.getElementById('readingsList');
   const res=await apiFetch('/api/weather/readings/');
-  if(!res||!res.ok){list.innerHTML='<p class="loading-text">click refresh weather to get readings for your farms.</p>';return;}
-  const data=await res.json(); const readings=data.results||data; list.innerHTML='';
-  if(!readings.length){list.innerHTML='<p class="loading-text">no readings yet. click refresh weather above.</p>';return;}
-  readings.forEach(r=>{
-    const temp=parseFloat(r.temperature||0);
-    const tempColor=temp>35?'#e05252':temp<10?'#5296e0':'#4a7c3f';
-    list.innerHTML+=`<div class="reading-item" style="background:#fff;border:1px solid #e8ede8;border-radius:10px;padding:14px;margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+  if(!res||!res.ok){
+    list.innerHTML='<p class="loading-text">no readings yet — click refresh above.</p>';
+    return;
+  }
+  const readings=(await res.json()).results||[];
+  if(!readings.length){
+    list.innerHTML='<p class="loading-text">no readings yet — click refresh above.</p>';
+    return;
+  }
+  list.innerHTML=readings.map(r=>{
+    const t=parseFloat(r.temperature||20);
+    const tc=t>35?'#e05252':t<10?'#5296e0':'#4a7c3f';
+    const feels=Math.round(t - (0.4*(t-10)*(1-(parseFloat(r.humidity||50)/100))));
+    return `<div style="background:#fff;border:1px solid #e8ede8;border-radius:12px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <strong style="font-size:14px">${r.farm_name||'farm'}</strong>
-        <span style="font-size:12px;color:#888;text-transform:capitalize">${r.description||''}</span>
+        <span style="font-size:12px;color:#888;text-transform:capitalize;background:#f0f8e8;padding:3px 10px;border-radius:20px">${r.description||'clear'}</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
+        <div style="background:#f8fbf4;border-radius:8px;padding:10px">
+          <p style="font-size:24px;font-weight:700;color:${tc};margin:0">${t}°C</p>
+          <p style="font-size:10px;color:#888;margin:3px 0 0">temperature</p>
+        </div>
+        <div style="background:#f8fbf4;border-radius:8px;padding:10px">
+          <p style="font-size:24px;font-weight:700;color:#5296e0;margin:0">${r.humidity||0}%</p>
+          <p style="font-size:10px;color:#888;margin:3px 0 0">humidity</p>
+        </div>
+        <div style="background:#f8fbf4;border-radius:8px;padding:10px">
+          <p style="font-size:24px;font-weight:700;color:#888;margin:0">${r.wind_speed||0}</p>
+          <p style="font-size:10px;color:#888;margin:3px 0 0">wind m/s</p>
+        </div>
+        <div style="background:#f8fbf4;border-radius:8px;padding:10px">
+          <p style="font-size:24px;font-weight:700;color:#5296e0;margin:0">${r.rainfall_mm||0}mm</p>
+          <p style="font-size:10px;color:#888;margin:3px 0 0">rainfall</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;text-align:center">
         <div style="background:#f8fbf4;border-radius:8px;padding:8px">
-          <p style="font-size:22px;font-weight:700;color:${tempColor};margin:0">${temp}°C</p>
-          <p style="font-size:11px;color:#888;margin:2px 0 0">temperature</p>
+          <p style="font-size:14px;font-weight:600;color:#666;margin:0">feels like ${feels}°C</p>
+          <p style="font-size:10px;color:#888;margin:2px 0 0">apparent temperature</p>
         </div>
         <div style="background:#f8fbf4;border-radius:8px;padding:8px">
-          <p style="font-size:22px;font-weight:700;color:#5296e0;margin:0">${r.humidity||0}%</p>
-          <p style="font-size:11px;color:#888;margin:2px 0 0">humidity</p>
-        </div>
-        <div style="background:#f8fbf4;border-radius:8px;padding:8px">
-          <p style="font-size:22px;font-weight:700;color:#888;margin:0">${r.wind_speed||0}</p>
-          <p style="font-size:11px;color:#888;margin:2px 0 0">wind m/s</p>
-        </div>
-        <div style="background:#f8fbf4;border-radius:8px;padding:8px">
-          <p style="font-size:22px;font-weight:700;color:#5296e0;margin:0">${r.rainfall_mm||0}mm</p>
-          <p style="font-size:11px;color:#888;margin:2px 0 0">rainfall</p>
+          <p style="font-size:14px;font-weight:600;color:#666;margin:0">${r.humidity>70?'high':'normal'} moisture</p>
+          <p style="font-size:10px;color:#888;margin:2px 0 0">disease risk: ${r.humidity>80?'elevated':'low'}</p>
         </div>
       </div>
     </div>`;
-  });
+  }).join('');
 }
 
 document.getElementById('refreshWeatherBtn').addEventListener('click', async (e)=>{
   e.target.disabled=true; e.target.textContent='fetching...';
-  const res=await apiFetch('/api/weather/readings/refresh/',{method:'POST'});
-  if(res&&res.ok){const data=await res.json(); console.log('refreshed:',data);}
+  await apiFetch('/api/weather/readings/refresh/',{method:'POST'});
   e.target.disabled=false; e.target.textContent='refresh weather now';
   loadAlerts(); loadReadings();
 });

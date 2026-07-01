@@ -293,3 +293,6 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = env('ACCOUNT_DEFAULT_HTTP_PROTOCOL', default='ht
 
 GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 
+
+# railway production URL for oauth
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
