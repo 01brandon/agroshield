@@ -6,7 +6,7 @@
 <div class="scan-layout">
   <div class="scan-upload-box">
     <h3>scan your crop</h3>
-    <p>take a photo or upload an image — gpt-4o vision analyses it and gives you an accurate diagnosis</p>
+    <p>take a photo or upload an image — gemini vision analyses it and gives you an accurate diagnosis</p>
     <form id="scanForm">
       <div class="form-group"><label>select farm</label>
         <select name="farm" id="scanFarmSelect" required><option value="">loading farms...</option></select>
@@ -50,13 +50,27 @@
 .result-image{width:100%;height:130px;object-fit:cover;border-radius:8px;margin-bottom:12px}
 .confidence-bar{height:6px;background:#e0ede0;border-radius:3px;margin:6px 0 12px}
 .confidence-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#7ab648,#4a7c3f)}
-.delete-scan-btn{position:absolute;top:12px;right:12px;background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px}
-.delete-scan-btn:hover{color:#e05252;background:#fff0f0}
+.delete-scan-btn{
+  position:absolute;
+  top:12px;right:12px;
+  background:#fee2e2;
+  border:1px solid #fca5a5;
+  color:#dc2626;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:600;
+  padding:4px 10px;
+  border-radius:6px;
+  line-height:1.4;
+  z-index:10;
+}
+.delete-scan-btn:hover{background:#dc2626;color:#fff;border-color:#dc2626}
 .organic-tip{font-size:12px;color:#4a7c3f;background:#f0f8e8;border-radius:8px;padding:8px 12px;margin-top:8px}
 </style>
 {% endblock %}
 
 {% block extra_js %}
+{% load static %}
 <script>
 const CLOUD_NAME = '{{ cloudinary_cloud_name|default:"" }}';
 const uploadArea=document.getElementById('uploadArea'),fileInput=document.getElementById('cropImageFile'),
@@ -98,12 +112,12 @@ async function loadFarmsDropdown() {
 
 document.getElementById('scanForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const farm = document.getElementById('scanFarmSelect').value;
-  const url  = urlInput.value;
+  const farm  = document.getElementById('scanFarmSelect').value;
+  const url   = urlInput.value;
   const notes = document.getElementById('scanNotes').value;
   if (!url)  { scanError.textContent='upload a photo first'; return; }
   if (!farm) { scanError.textContent='select a farm'; return; }
-  submitBtn.disabled=true; submitBtn.textContent='analysing with gpt-4o vision...';
+  submitBtn.disabled=true; submitBtn.textContent='analysing with gemini vision...';
   scanError.textContent = '';
   const res = await apiFetch('/api/disease/', {method:'POST', body: JSON.stringify({farm, cloudinary_url:url, notes})});
   if (res && res.ok) {
@@ -116,16 +130,21 @@ document.getElementById('scanForm').addEventListener('submit', async (e) => {
   }
 });
 
-async function deleteScan(id, el) {
+async function deleteScan(id, btn) {
   if (!confirm('delete this scan?')) return;
+  btn.disabled=true; btn.textContent='deleting...';
   const res = await apiFetch(`/api/disease/${id}/`, {method:'DELETE'});
   if (res && (res.status === 204 || res.ok)) {
-    el.closest('.result-card').remove();
+    document.getElementById('scan-' + id).remove();
+  } else {
+    btn.disabled=false; btn.textContent='delete';
+    alert('could not delete scan — please try again');
   }
 }
 
 async function loadScans() {
   const list = document.getElementById('scansList');
+  list.innerHTML = '<p class="loading-text">loading...</p>';
   const res  = await apiFetch('/api/disease/');
   if (!res || !res.ok) { list.innerHTML='<p class="loading-text">could not load scans.</p>'; return; }
   const data  = await res.json(); const scans = data.results || data;
@@ -134,8 +153,11 @@ async function loadScans() {
   scans.forEach(scan => {
     const conf   = Math.round((scan.confidence_score || 0) * 100);
     const isGood = scan.status === 'confirmed';
-    list.innerHTML += `<div class="result-card" id="scan-${scan.id}">
-      <button class="delete-scan-btn" onclick="deleteScan(${scan.id}, this)" title="delete scan">&#10005;</button>
+    const card   = document.createElement('div');
+    card.className = 'result-card';
+    card.id = 'scan-' + scan.id;
+    card.innerHTML = `
+      <button class="delete-scan-btn" title="delete scan">delete</button>
       ${scan.cloudinary_url ? `<img src="${scan.cloudinary_url}" class="result-image" alt="crop scan">` : ''}
       <div class="disease-name" style="color:${isGood?'#1a2e1a':'#888'}">${scan.disease_detected || 'awaiting diagnosis'}</div>
       <div style="font-size:12px;color:#888">confidence: ${conf}% &bull; ${scan.status}
@@ -144,7 +166,11 @@ async function loadScans() {
       ${scan.treatment_advice ? `<div style="font-size:13px;color:#333;margin-top:8px"><strong>treatment:</strong> ${scan.treatment_advice}</div>` : ''}
       ${scan.organic_alt ? `<div class="organic-tip"><strong>organic option:</strong> ${scan.organic_alt}</div>` : ''}
       <p style="font-size:11px;color:#aaa;margin-top:10px">${new Date(scan.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</p>
-    </div>`;
+    `;
+    card.querySelector('.delete-scan-btn').addEventListener('click', function() {
+      deleteScan(scan.id, this);
+    });
+    list.appendChild(card);
   });
 }
 
