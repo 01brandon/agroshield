@@ -64,9 +64,27 @@
   line-height:1.4;
   z-index:10;
 }
-.delete-scan-btn:hover{background:#111;color:#fff;border-color:#111}
+.delete-scan-btn:hover{background:#1a2e1a;color:#a8d85c;border-color:#1a2e1a}
 .organic-tip{font-size:12px;color:#4a7c3f;background:#f0f8e8;border-radius:8px;padding:8px 12px;margin-top:8px}
 </style>
+<div id="deleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px)">
+  <div style="background:#fff;border-radius:16px;padding:32px 28px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.2);text-align:center">
+    <div style="width:48px;height:48px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;color:#dc2626">&#10005;</div>
+    <h3 style="margin:0 0 8px;font-size:17px;color:#1a2e1a;font-weight:700">delete scan?</h3>
+    <p style="margin:0 0 24px;font-size:14px;color:#888;line-height:1.5">this scan and its results will be permanently removed.</p>
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('deleteModal').style.display='none'"
+        style="flex:1;padding:11px;border:1.5px solid #dde4da;border-radius:10px;background:#fff;color:#555;font-size:14px;font-weight:600;cursor:pointer">
+        cancel
+      </button>
+      <button id="deleteConfirmBtn"
+        style="flex:1;padding:11px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-size:14px;font-weight:600;cursor:pointer">
+        delete
+      </button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -130,16 +148,23 @@ document.getElementById('scanForm').addEventListener('submit', async (e) => {
   }
 });
 
-async function deleteScan(id, btn) {
-  if (!confirm('delete this scan?')) return;
-  btn.disabled=true; btn.textContent='deleting...';
-  const res = await apiFetch(`/api/disease/${id}/`, {method:'DELETE'});
-  if (res && (res.status === 204 || res.ok)) {
-    document.getElementById('scan-' + id).remove();
-  } else {
-    btn.disabled=false; btn.textContent='delete';
-    alert('could not delete scan — please try again');
-  }
+function deleteScan(id, btn) {
+  const modal = document.getElementById('deleteModal');
+  const confirmBtn = document.getElementById('deleteConfirmBtn');
+  modal.style.display = 'flex';
+  confirmBtn.onclick = async () => {
+    modal.style.display = 'none';
+    btn.disabled = true; btn.innerHTML = '&hellip;';
+    const res = await apiFetch(`/api/disease/${id}/`, {method:'DELETE'});
+    if (res && (res.status === 204 || res.ok)) {
+      const card = document.getElementById('scan-' + id);
+      card.style.opacity = '0'; card.style.transform = 'scale(0.97)';
+      card.style.transition = 'opacity 0.2s, transform 0.2s';
+      setTimeout(() => card.remove(), 200);
+    } else {
+      btn.disabled = false; btn.innerHTML = '&times;';
+    }
+  };
 }
 
 async function loadScans() {

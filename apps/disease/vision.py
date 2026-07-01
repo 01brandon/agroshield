@@ -40,7 +40,7 @@ def analyse_crop_image(image_url):
             }
         }
         res = requests.post(
-            f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}',
+            f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key={api_key}',
             headers = {'Content-Type': 'application/json'},
             json    = payload,
             timeout = 40,
