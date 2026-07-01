@@ -1,56 +1,98 @@
 import os, requests, base64, random
-
-DISEASE_DB = [
-    ('Northern Corn Leaf Blight', 'apply mancozeb fungicide at 2.5kg per hectare every 14 days. remove infected leaves.', 'neem oil spray at 5ml per litre of water every 7 days.'),
-    ('Cercospora Leaf Spot', 'apply azoxystrobin fungicide at 1 litre per hectare every 21 days.', 'apply compost tea spray weekly.'),
-    ('Nitrogen Deficiency', 'apply urea at 50kg per hectare in split applications.', 'apply well-rotted compost at 5 tonnes per hectare.'),
-    ('Aphid Infestation', 'apply lambda-cyhalothrin insecticide at label rate.', 'spray diluted dish soap solution weekly.'),
-    ('No Disease Detected', 'your crop appears healthy. maintain current practices.', 'continue organic practices and monitor weekly.'),
-]
-
-def get_gcp_token():
-    try:
-        creds_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', '/root/.config/gcloud/application_default_credentials.json')
-        if not os.path.exists(creds_path):
-            return None
-        import json
-        with open(creds_path) as f:
-            creds = json.load(f)
-        if creds.get('type') == 'authorized_user':
-            r = requests.post('https://oauth2.googleapis.com/token', data={
-                'client_id': creds['client_id'], 'client_secret': creds['client_secret'],
-                'refresh_token': creds['refresh_token'], 'grant_type': 'refresh_token'}, timeout=10)
-            if r.status_code == 200:
-                return r.json()['access_token']
-    except Exception:
-        pass
-    return None
+from django.conf import settings
 
 def analyse_crop_image(image_url):
-    try:
-        img = requests.get(image_url, timeout=15)
-        if img.status_code != 200:
-            return _simulated()
-        token = get_gcp_token()
-        if not token:
-            return _simulated()
-        encoded = base64.b64encode(img.content).decode('utf-8')
-        payload = {'requests': [{'image': {'content': encoded}, 'features': [{'type': 'LABEL_DETECTION', 'maxResults': 10}]}]}
-        res = requests.post('https://vision.googleapis.com/v1/images:annotate', json=payload,
-                             headers={'Authorization': f'Bearer {token}'}, timeout=30)
-        if res.status_code != 200:
-            return _simulated()
-        labels = res.json()['responses'][0].get('labelAnnotations', [])
-        names = [l['description'].lower() for l in labels]
-        for disease, treatment, organic in DISEASE_DB:
-            key = disease.split()[0].lower()
-            if any(key in n for n in names):
-                return {'disease_detected': disease, 'confidence_score': 0.88, 'treatment_advice': treatment, 'organic_alt': organic, 'status': 'confirmed'}
-        return _simulated()
-    except Exception:
-        return _simulated()
+    api_key = getattr(settings, 'OPENAI_API_KEY', '')
 
-def _simulated():
-    disease, treatment, organic = random.choice(DISEASE_DB)
-    return {'disease_detected': disease, 'confidence_score': round(random.uniform(0.75, 0.95), 2),
-            'treatment_advice': treatment, 'organic_alt': organic, 'status': 'confirmed'}
+    if api_key and 'your_openai' not in api_key:
+        try:
+            # download image and encode as base64
+            img_res = requests.get(image_url, timeout=15)
+            if img_res.status_code != 200:
+                return _fallback('could not download image')
+
+            encoded   = base64.b64encode(img_res.content).decode('utf-8')
+            mime_type = img_res.headers.get('content-type', 'image/jpeg').split(';')[0]
+
+            payload = {
+                'model': 'gpt-4o',
+                'max_tokens': 600,
+                'messages': [{
+                    'role': 'user',
+                    'content': [
+                        {
+                            'type': 'image_url',
+                            'image_url': {
+                                'url':    f'data:{mime_type};base64,{encoded}',
+                                'detail': 'high',
+                            }
+                        },
+                        {
+                            'type': 'text',
+                            'text': (
+                                'you are an expert plant pathologist. analyse this crop image carefully.\n\n'
+                                'respond in this exact format and nothing else:\n'
+                                'DISEASE: <name of disease, pest, deficiency, or "Healthy Crop">\n'
+                                'CONFIDENCE: <number 0-100>\n'
+                                'CAUSE: <one sentence explaining what caused this>\n'
+                                'TREATMENT: <specific actionable chemical treatment with dosage>\n'
+                                'ORGANIC: <specific organic or natural alternative treatment>\n\n'
+                                'if the image is not a plant, respond with DISEASE: Not a Plant Image and leave other fields empty.'
+                            )
+                        }
+                    ]
+                }]
+            }
+
+            res = requests.post(
+                'https://api.openai.com/v1/chat/completions',
+                headers = {'Authorization': f'Bearer {api_key}', 'Content-Type': 'application/json'},
+                json    = payload,
+                timeout = 40,
+            )
+
+            if res.status_code == 200:
+                text = res.json()['choices'][0]['message']['content']
+                return _parse_gpt_response(text)
+
+            print(f'openai vision error: {res.status_code} {res.text}')
+
+        except Exception as e:
+            print(f'openai vision exception: {e}')
+
+    # only falls through here if no api key at all
+    return _fallback('openai api key not configured')
+
+
+def _parse_gpt_response(text):
+    lines    = {}
+    for line in text.strip().split('\n'):
+        if ':' in line:
+            key, _, val = line.partition(':')
+            lines[key.strip().upper()] = val.strip()
+
+    disease    = lines.get('DISEASE', 'Unidentified Condition')
+    confidence = int(lines.get('CONFIDENCE', '70').replace('%','').strip()) / 100
+    treatment  = lines.get('TREATMENT', 'consult a local agronomist for treatment advice.')
+    organic    = lines.get('ORGANIC', '')
+
+    is_healthy = 'healthy' in disease.lower()
+    status     = 'confirmed' if confidence >= 0.70 else 'pending'
+
+    return {
+        'disease_detected': disease,
+        'confidence_score': round(min(confidence, 1.0), 2),
+        'treatment_advice': treatment,
+        'organic_alt':      organic,
+        'status':           status,
+    }
+
+
+def _fallback(reason):
+    return {
+        'disease_detected': 'diagnosis pending',
+        'confidence_score': 0.0,
+        'treatment_advice': f'automated diagnosis unavailable: {reason}. an agronomist will review shortly.',
+        'organic_alt':      '',
+        'status':           'pending',
+    }
