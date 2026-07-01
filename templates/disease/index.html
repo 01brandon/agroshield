@@ -64,7 +64,7 @@
   line-height:1.4;
   z-index:10;
 }
-.delete-scan-btn:hover{background:#dc2626;color:#fff;border-color:#dc2626}
+.delete-scan-btn:hover{background:#111;color:#fff;border-color:#111}
 .organic-tip{font-size:12px;color:#4a7c3f;background:#f0f8e8;border-radius:8px;padding:8px 12px;margin-top:8px}
 </style>
 {% endblock %}
@@ -157,7 +157,7 @@ async function loadScans() {
     card.className = 'result-card';
     card.id = 'scan-' + scan.id;
     card.innerHTML = `
-      <button class="delete-scan-btn" title="delete scan">delete</button>
+      <button class="delete-scan-btn" title="delete scan">&times;</button>
       ${scan.cloudinary_url ? `<img src="${scan.cloudinary_url}" class="result-image" alt="crop scan">` : ''}
       <div class="disease-name" style="color:${isGood?'#1a2e1a':'#888'}">${scan.disease_detected || 'awaiting diagnosis'}</div>
       <div style="font-size:12px;color:#888">confidence: ${conf}% &bull; ${scan.status}
