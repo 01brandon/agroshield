@@ -6,7 +6,7 @@
 <div class="scan-layout">
   <div class="scan-upload-box">
     <h3>scan your crop</h3>
-    <p>take a photo or upload an image — gemini vision analyses it and gives you an accurate diagnosis</p>
+    <p>take a photo or upload an image — gemini ai analyses it and gives you an accurate diagnosis</p>
     <form id="scanForm">
       <div class="form-group"><label>select farm</label>
         <select name="farm" id="scanFarmSelect" required><option value="">loading farms...</option></select>
@@ -46,49 +46,20 @@
 .spinner{width:32px;height:32px;border:3px solid #e0ede0;border-top-color:#7ab648;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 .result-card{background:#fff;border:1px solid #e8ede8;border-radius:12px;padding:18px;margin-bottom:12px;position:relative}
-.result-card .disease-name{font-size:16px;font-weight:700;color:#1a2e1a;margin-bottom:4px}
 .result-image{width:100%;height:130px;object-fit:cover;border-radius:8px;margin-bottom:12px}
-.confidence-bar{height:6px;background:#e0ede0;border-radius:3px;margin:6px 0 12px}
-.confidence-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#7ab648,#4a7c3f)}
-.delete-scan-btn{
-  position:absolute;
-  top:12px;right:12px;
-  background:#fee2e2;
-  border:1px solid #fca5a5;
-  color:#dc2626;
-  cursor:pointer;
-  font-size:13px;
-  font-weight:600;
-  padding:4px 10px;
-  border-radius:6px;
-  line-height:1.4;
-  z-index:10;
-}
-.delete-scan-btn:hover{background:#1a2e1a;color:#a8d85c;border-color:#1a2e1a}
+.disease-name{font-size:16px;font-weight:700;color:#1a2e1a;margin-bottom:6px}
+.confidence-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-right:6px}
+.badge-high{background:#1a3a1a;color:#a8d85c}
+.badge-moderate{background:#2c4a1a;color:#c8e090}
+.badge-low{background:#4a3a0a;color:#e0c870}
+.badge-pending{background:#3a3a3a;color:#aaa}
 .organic-tip{font-size:12px;color:#4a7c3f;background:#f0f8e8;border-radius:8px;padding:8px 12px;margin-top:8px}
+.delete-scan-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid #eee;color:#ccc;cursor:pointer;font-size:12px;padding:2px 7px;border-radius:6px;line-height:1.4}
+.delete-scan-btn:hover{color:#e05252;border-color:#e05252;background:#fff0f0}
 </style>
-<div id="deleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px)">
-  <div style="background:#fff;border-radius:16px;padding:32px 28px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.2);text-align:center">
-    <div style="width:48px;height:48px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;color:#dc2626">&#10005;</div>
-    <h3 style="margin:0 0 8px;font-size:17px;color:#1a2e1a;font-weight:700">delete scan?</h3>
-    <p style="margin:0 0 24px;font-size:14px;color:#888;line-height:1.5">this scan and its results will be permanently removed.</p>
-    <div style="display:flex;gap:10px">
-      <button onclick="document.getElementById('deleteModal').style.display='none'"
-        style="flex:1;padding:11px;border:1.5px solid #dde4da;border-radius:10px;background:#fff;color:#555;font-size:14px;font-weight:600;cursor:pointer">
-        cancel
-      </button>
-      <button id="deleteConfirmBtn"
-        style="flex:1;padding:11px;border:none;border-radius:10px;background:#dc2626;color:#fff;font-size:14px;font-weight:600;cursor:pointer">
-        delete
-      </button>
-    </div>
-  </div>
-</div>
-
 {% endblock %}
 
 {% block extra_js %}
-{% load static %}
 <script>
 const CLOUD_NAME = '{{ cloudinary_cloud_name|default:"" }}';
 const uploadArea=document.getElementById('uploadArea'),fileInput=document.getElementById('cropImageFile'),
@@ -96,109 +67,88 @@ const uploadArea=document.getElementById('uploadArea'),fileInput=document.getEle
   progress=document.getElementById('uploadProgress'),urlInput=document.getElementById('cloudinaryUrl'),
   submitBtn=document.getElementById('scanSubmitBtn'),scanError=document.getElementById('scanError');
 
-uploadArea.addEventListener('click', () => fileInput.click());
+uploadArea.addEventListener('click',()=>fileInput.click());
 
-fileInput.addEventListener('change', async (e) => {
-  const file = e.target.files[0]; if (!file) return;
+fileInput.addEventListener('change', async (e)=>{
+  const file=e.target.files[0]; if(!file) return;
   placeholder.style.display='none'; preview.style.display='none';
   progress.style.display='block'; submitBtn.disabled=true; scanError.textContent='';
-  try {
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', 'agroshield_unsigned');
-    fd.append('folder', 'agroshield/scans');
-    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {method:'POST', body:fd});
-    const data = await res.json();
-    if (data.secure_url) {
+  try{
+    const fd=new FormData();
+    fd.append('file',file); fd.append('upload_preset','agroshield_unsigned'); fd.append('folder','agroshield/scans');
+    const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,{method:'POST',body:fd});
+    const data=await res.json();
+    if(data.secure_url){
       urlInput.value=data.secure_url; preview.src=data.secure_url;
       preview.style.display='block'; progress.style.display='none'; submitBtn.disabled=false;
-    } else throw new Error(data.error?.message || 'upload failed — check cloudinary upload preset is named agroshield_unsigned and set to unsigned');
-  } catch(err) {
+    } else throw new Error(data.error?.message||'upload failed');
+  }catch(err){
     progress.style.display='none'; placeholder.style.display='flex';
-    scanError.textContent = 'upload failed: ' + err.message;
+    scanError.textContent='upload failed: '+err.message;
   }
 });
 
-async function loadFarmsDropdown() {
-  const res = await apiFetch('/api/farms/'); if (!res || !res.ok) return;
-  const data = await res.json(); const farms = data.results || data;
-  const sel  = document.getElementById('scanFarmSelect');
-  sel.innerHTML = farms.length
-    ? farms.map(f => `<option value="${f.id}">${f.name} (${f.primary_crop})</option>`).join('')
-    : '<option value="">add a farm first</option>';
+async function loadFarmsDropdown(){
+  const res=await apiFetch('/api/farms/'); if(!res||!res.ok) return;
+  const farms=(await res.json()).results||[];
+  const sel=document.getElementById('scanFarmSelect');
+  sel.innerHTML=farms.length?farms.map(f=>`<option value="${f.id}">${f.name} (${f.primary_crop})</option>`).join(''):'<option value="">add a farm first</option>';
 }
 
-document.getElementById('scanForm').addEventListener('submit', async (e) => {
+document.getElementById('scanForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
-  const farm  = document.getElementById('scanFarmSelect').value;
-  const url   = urlInput.value;
-  const notes = document.getElementById('scanNotes').value;
-  if (!url)  { scanError.textContent='upload a photo first'; return; }
-  if (!farm) { scanError.textContent='select a farm'; return; }
-  submitBtn.disabled=true; submitBtn.textContent='analysing with gemini vision...';
-  scanError.textContent = '';
-  const res = await apiFetch('/api/disease/', {method:'POST', body: JSON.stringify({farm, cloudinary_url:url, notes})});
-  if (res && res.ok) {
+  const farm=document.getElementById('scanFarmSelect').value, url=urlInput.value;
+  if(!url){scanError.textContent='upload a photo first';return;}
+  if(!farm){scanError.textContent='select a farm';return;}
+  submitBtn.disabled=true; submitBtn.textContent='analysing...';
+  const res=await apiFetch('/api/disease/',{method:'POST',body:JSON.stringify({farm,cloudinary_url:url,notes:document.getElementById('scanNotes').value})});
+  if(res&&res.ok){
     fileInput.value=''; urlInput.value=''; preview.style.display='none';
     placeholder.style.display='flex'; submitBtn.textContent='analyse with ai'; submitBtn.disabled=true;
     loadScans();
-  } else if (res) {
-    const data = await res.json(); scanError.textContent = Object.values(data).flat().join(' ');
+  }else if(res){
+    const data=await res.json(); scanError.textContent=Object.values(data).flat().join(' ');
     submitBtn.textContent='analyse with ai'; submitBtn.disabled=false;
   }
 });
 
-function deleteScan(id, btn) {
-  const modal = document.getElementById('deleteModal');
-  const confirmBtn = document.getElementById('deleteConfirmBtn');
-  modal.style.display = 'flex';
-  confirmBtn.onclick = async () => {
-    modal.style.display = 'none';
-    btn.disabled = true; btn.innerHTML = '&hellip;';
-    const res = await apiFetch(`/api/disease/${id}/`, {method:'DELETE'});
-    if (res && (res.status === 204 || res.ok)) {
-      const card = document.getElementById('scan-' + id);
-      card.style.opacity = '0'; card.style.transform = 'scale(0.97)';
-      card.style.transition = 'opacity 0.2s, transform 0.2s';
-      setTimeout(() => card.remove(), 200);
-    } else {
-      btn.disabled = false; btn.innerHTML = '&times;';
-    }
-  };
+function confidenceBadge(conf){
+  if(conf>=85) return '<span class="confidence-badge badge-high">highly likely</span>';
+  if(conf>=65) return '<span class="confidence-badge badge-moderate">moderate confidence</span>';
+  if(conf>=40) return '<span class="confidence-badge badge-low">low confidence</span>';
+  return '<span class="confidence-badge badge-pending">awaiting review</span>';
 }
 
-async function loadScans() {
-  const list = document.getElementById('scansList');
-  list.innerHTML = '<p class="loading-text">loading...</p>';
-  const res  = await apiFetch('/api/disease/');
-  if (!res || !res.ok) { list.innerHTML='<p class="loading-text">could not load scans.</p>'; return; }
-  const data  = await res.json(); const scans = data.results || data;
-  list.innerHTML = '';
-  if (!scans.length) { list.innerHTML='<p class="loading-text">no scans yet. take your first photo above.</p>'; return; }
-  scans.forEach(scan => {
-    const conf   = Math.round((scan.confidence_score || 0) * 100);
-    const isGood = scan.status === 'confirmed';
-    const card   = document.createElement('div');
-    card.className = 'result-card';
-    card.id = 'scan-' + scan.id;
-    card.innerHTML = `
-      <button class="delete-scan-btn" title="delete scan">&times;</button>
-      ${scan.cloudinary_url ? `<img src="${scan.cloudinary_url}" class="result-image" alt="crop scan">` : ''}
-      <div class="disease-name" style="color:${isGood?'#1a2e1a':'#888'}">${scan.disease_detected || 'awaiting diagnosis'}</div>
-      <div style="font-size:12px;color:#888">confidence: ${conf}% &bull; ${scan.status}
-        <div class="confidence-bar"><div class="confidence-fill" style="width:${conf}%"></div></div>
+async function deleteScan(id){
+  if(!confirm('delete this scan?')) return;
+  const res=await apiFetch(`/api/disease/${id}/`,{method:'DELETE'});
+  if(res&&(res.status===204||res.ok)) document.getElementById(`scan-${id}`).remove();
+}
+
+async function loadScans(){
+  const list=document.getElementById('scansList');
+  const res=await apiFetch('/api/disease/');
+  if(!res||!res.ok){list.innerHTML='<p class="loading-text">could not load scans.</p>';return;}
+  const scans=(await res.json()).results||[];
+  list.innerHTML='';
+  if(!scans.length){list.innerHTML='<p class="loading-text">no scans yet. take your first photo above.</p>';return;}
+  scans.forEach(scan=>{
+    const conf=Math.round((scan.confidence_score||0)*100);
+    const isGood=scan.status==='confirmed';
+    list.innerHTML+=`<div class="result-card" id="scan-${scan.id}">
+      <button class="delete-scan-btn" onclick="deleteScan(${scan.id})" title="delete">&#10005;</button>
+      ${scan.cloudinary_url?`<img src="${scan.cloudinary_url}" class="result-image" alt="crop scan">`:''}
+      <div class="disease-name">${scan.disease_detected||'awaiting diagnosis'}</div>
+      <div style="margin-bottom:10px">
+        ${confidenceBadge(conf)}
+        <span style="font-size:12px;color:#aaa">${new Date(scan.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>
       </div>
-      ${scan.treatment_advice ? `<div style="font-size:13px;color:#333;margin-top:8px"><strong>treatment:</strong> ${scan.treatment_advice}</div>` : ''}
-      ${scan.organic_alt ? `<div class="organic-tip"><strong>organic option:</strong> ${scan.organic_alt}</div>` : ''}
-      <p style="font-size:11px;color:#aaa;margin-top:10px">${new Date(scan.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</p>
-    `;
-    card.querySelector('.delete-scan-btn').addEventListener('click', function() {
-      deleteScan(scan.id, this);
-    });
-    list.appendChild(card);
+      ${scan.treatment_advice?`<div style="font-size:13px;color:#333;margin-top:6px"><strong>treatment:</strong> ${scan.treatment_advice}</div>`:''}
+      ${scan.organic_alt?`<div class="organic-tip"><strong>organic option:</strong> ${scan.organic_alt}</div>`:''}
+    </div>`;
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => { loadFarmsDropdown(); loadScans(); });
+document.addEventListener('DOMContentLoaded',()=>{loadFarmsDropdown();loadScans();});
 </script>
 {% endblock %}
