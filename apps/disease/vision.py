@@ -22,84 +22,30 @@ def analyse_crop_image(image_url):
 
     gemini_key = getattr(settings, 'GEMINI_API_KEY', '')
     if gemini_key and 'your_gemini' not in gemini_key:
-        result = _try_gemini(gemini_key, encoded, mime_type)
-        if result:
-            return result
-
-    openai_key = getattr(settings, 'OPENAI_API_KEY', '')
-    if openai_key and 'your_openai' not in openai_key:
-        result = _try_openai(openai_key, encoded, mime_type)
-        if result:
-            return result
-
-    return _fallback('no working AI key configured')
-
-
-def _try_gemini(api_key, encoded, mime_type):
-    try:
-        payload = {
-            'contents': [{'parts': [
-                {'inline_data': {'mime_type': mime_type, 'data': encoded}},
-                {'text': PROMPT}
-            ]}],
-            'generationConfig': {'temperature': 0.1, 'maxOutputTokens': 400}
-        }
-
-        # auth keys use Bearer header, standard keys use ?key= param
-        # try bearer first (new auth key format starting with AQ.)
-        if api_key.startswith('AQ.'):
+        try:
             res = requests.post(
-                'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
-                json    = payload,
-                headers = {
+                'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+                headers={
                     'Content-Type':  'application/json',
-                    'Authorization': f'Bearer {api_key}',
+                    'x-goog-api-key': gemini_key,
                 },
-                timeout = 40,
+                json={
+                    'contents': [{'parts': [
+                        {'inline_data': {'mime_type': mime_type, 'data': encoded}},
+                        {'text': PROMPT}
+                    ]}],
+                    'generationConfig': {'temperature': 0.1, 'maxOutputTokens': 400}
+                },
+                timeout=40,
             )
-        else:
-            # standard key starting with AIza
-            res = requests.post(
-                f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}',
-                json    = payload,
-                headers = {'Content-Type': 'application/json'},
-                timeout = 40,
-            )
+            if res.status_code == 200:
+                text = res.json()['candidates'][0]['content']['parts'][0]['text']
+                return _parse(text)
+            print(f'gemini error {res.status_code}: {res.text[:200]}')
+        except Exception as e:
+            print(f'gemini exception: {e}')
 
-        if res.status_code == 200:
-            text = res.json()['candidates'][0]['content']['parts'][0]['text']
-            return _parse(text)
-
-        print(f'gemini error {res.status_code}: {res.text[:150]}')
-        return None
-
-    except Exception as e:
-        print(f'gemini exception: {e}')
-        return None
-
-
-def _try_openai(api_key, encoded, mime_type):
-    try:
-        res = requests.post(
-            'https://api.openai.com/v1/chat/completions',
-            headers = {'Authorization': f'Bearer {api_key}', 'Content-Type': 'application/json'},
-            json = {
-                'model': 'gpt-4o',
-                'max_tokens': 400,
-                'messages': [{'role': 'user', 'content': [
-                    {'type': 'image_url', 'image_url': {'url': f'data:{mime_type};base64,{encoded}', 'detail': 'high'}},
-                    {'type': 'text', 'text': PROMPT}
-                ]}]
-            },
-            timeout = 40,
-        )
-        if res.status_code == 200:
-            return _parse(res.json()['choices'][0]['message']['content'])
-        print(f'openai error {res.status_code}: {res.text[:100]}')
-        return None
-    except Exception as e:
-        print(f'openai exception: {e}')
-        return None
+    return _fallback('gemini key not working — check GEMINI_API_KEY in railway variables')
 
 
 def _parse(text):
@@ -124,6 +70,6 @@ def _fallback(reason):
         'disease_detected': 'diagnosis pending',
         'confidence_score': 0.0,
         'treatment_advice': f'automated diagnosis unavailable: {reason}.',
-        'organic_alt': '',
-        'status': 'pending',
+        'organic_alt':      '',
+        'status':           'pending',
     }
