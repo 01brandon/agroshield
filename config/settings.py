@@ -197,12 +197,7 @@ REST_FRAMEWORK = {
     },
 }
 
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'AgroShield API',
-    'DESCRIPTION': 'AI-Powered Food Security & Agricultural Intelligence Platform',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-}
+
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME'),
@@ -296,3 +291,47 @@ GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 
 # railway production URL for oauth
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'AgroShield API',
+    'DESCRIPTION': 'AgroShield REST API for 20 modules including crop disease detection, weather, marketplace, forum, carbon credits, finance, and satellite monitoring.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SERVERS': [
+        {'url': 'https://agroshield-production-f5fc.up.railway.app', 'description': 'Production'},
+        {'url': 'http://localhost:8000', 'description': 'Local Development'},
+    ],
+    'TAGS': [
+        {'name': 'auth',         'description': 'Registration, login, JWT tokens, Google OAuth.'},
+        {'name': 'farms',        'description': 'Farm registration and management.'},
+        {'name': 'disease',      'description': 'AI crop disease detection via Google Gemini Vision.'},
+        {'name': 'weather',      'description': 'Weather readings and alerts from OpenWeatherMap.'},
+        {'name': 'marketplace',  'description': 'Listings, bids, and M-Pesa escrow payments.'},
+        {'name': 'forum',        'description': 'Community forum with AI co-pilot.'},
+        {'name': 'carbon',       'description': 'Carbon credit logging and verification.'},
+        {'name': 'finance',      'description': 'Farm P&L ledger and financial summary.'},
+        {'name': 'satellite',    'description': 'Planet API satellite NDVI monitoring.'},
+        {'name': 'search',       'description': 'Global search across farms, posts, and listings.'},
+        {'name': 'cooperatives', 'description': 'Farmer cooperative groups.'},
+        {'name': 'livestock',    'description': 'Animal health tracking.'},
+        {'name': 'soil',         'description': 'Soil health readings.'},
+        {'name': 'seeds',        'description': 'Certified seed and input store.'},
+        {'name': 'traceability', 'description': 'QR code supply chain tracking.'},
+        {'name': 'drones',       'description': 'Drone operator bookings.'},
+        {'name': 'equipment',    'description': 'Farm equipment rental.'},
+        {'name': 'alerts',       'description': 'Food security risk alerts.'},
+        {'name': 'campaigns',    'description': 'Push notification campaigns.'},
+        {'name': 'ivr',          'description': 'USSD and IVR logs.'},
+    ],
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': False,
+        'filter': True,
+        'docExpansion': 'none',
+        'defaultModelsExpandDepth': 2,
+        'tryItOutEnabled': True,
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SORT_OPERATIONS': False,
+}

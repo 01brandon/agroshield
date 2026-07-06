@@ -1,8 +1,39 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample
 from .models import CropScan
 from .serializers import CropScanSerializer
 
+@extend_schema_view(
+    list=extend_schema(
+        tags=['disease'],
+        summary='List all crop scans submitted by the authenticated user',
+        description='Returns scans ordered by most recent. Each scan includes disease name, confidence score, treatment advice, and organic alternative.'
+    ),
+    create=extend_schema(
+        tags=['disease'],
+        summary='Submit a crop image for AI diagnosis',
+        description='Upload a Cloudinary image URL. The image is analysed immediately using Google Gemini 1.5 Flash vision AI. Results are returned in the same response.',
+        examples=[
+            OpenApiExample('Example Request', value={
+                'farm': 1,
+                'cloudinary_url': 'https://res.cloudinary.com/dfk5falaw/image/upload/v1/agroshield/scans/sample.jpg',
+                'notes': 'Yellowing on lower leaves, brown spots visible on stem'
+            }, request_only=True),
+            OpenApiExample('Example Response', value={
+                'id': 5,
+                'disease_detected': 'Maize Dwarf Mosaic Virus (MDMV)',
+                'confidence_score': 0.87,
+                'status': 'confirmed',
+                'treatment_advice': 'Remove and destroy infected plants. Apply imidacloprid to control aphid vectors.',
+                'organic_alt': 'Introduce natural predators. Apply neem oil spray weekly.',
+                'created_at': '2026-07-03T09:15:00Z'
+            }, response_only=True)
+        ]
+    ),
+    retrieve=extend_schema(tags=['disease'], summary='Retrieve a specific crop scan result'),
+    destroy=extend_schema(tags=['disease'], summary='Delete a crop scan record'),
+)
 class CropScanViewSet(viewsets.ModelViewSet):
     serializer_class   = CropScanSerializer
     permission_classes = [permissions.IsAuthenticated]

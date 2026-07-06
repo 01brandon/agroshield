@@ -1,0 +1,3466 @@
+{
+  "info": {
+    "name": "AgroShield API",
+    "description": "Complete API collection for AgroShield. Run Auth - Login first to save your access token automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://agroshield-production-f5fc.up.railway.app",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"email\": \"john@farm.com\",\n  \"password\": \"Testpass123!\",\n  \"password2\": \"Testpass123!\",\n  \"role\": \"farmer\",\n  \"phone\": \"+254712345678\",\n  \"country\": \"Kenya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"brandonmukuria@gmail.com\",\n  \"password\": \"Testpass123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/token/refresh/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "token",
+                "refresh"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/profile/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "profile"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/profile/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "profile"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Brandon\",\n  \"phone\": \"+254725035925\",\n  \"country\": \"Kenya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"Testpass123!\",\n  \"new_password\": \"NewPass456!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Farms",
+      "item": [
+        {
+          "name": "List My Farms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farms/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "farms"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Farm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farms/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "farms"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Green Valley Farm\",\n  \"location_name\": \"Nakuru, Kenya\",\n  \"latitude\": -0.3031,\n  \"longitude\": 36.08,\n  \"size_hectares\": \"5.50\",\n  \"primary_crop\": \"maize\",\n  \"description\": \"Family farm in the Rift Valley.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Farm",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farms/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "farms",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Farm",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farms/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "farms",
+                "1"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated description.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Farm",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/farms/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "farms",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Crop Disease Detection",
+      "item": [
+        {
+          "name": "List Scans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/disease/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "disease"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Scan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/disease/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "disease"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm\": 1,\n  \"cloudinary_url\": \"https://res.cloudinary.com/dfk5falaw/image/upload/v1/agroshield/scans/sample.jpg\",\n  \"notes\": \"Yellowing on lower leaves\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Scan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/disease/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "disease",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Scan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/disease/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "disease",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Weather",
+      "item": [
+        {
+          "name": "List Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/weather/alerts/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "weather",
+                "alerts"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Readings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/weather/readings/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "weather",
+                "readings"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Weather",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/weather/readings/refresh/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "weather",
+                "readings",
+                "refresh"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Marketplace",
+      "item": [
+        {
+          "name": "Browse Listings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/listings/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "listings"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Listing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/listings/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "listings"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm\": 1,\n  \"crop\": \"maize\",\n  \"grade\": \"A\",\n  \"quantity_kg\": \"500\",\n  \"price_per_kg\": \"45.00\",\n  \"description\": \"Fresh harvest.\",\n  \"is_auction\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "My Listings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/listings/mine/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "listings",
+                "mine"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Bids",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/bids/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "bids"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Place Bid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/bids/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "bids"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"listing\": 1,\n  \"amount\": \"22000.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Accept Bid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/bids/1/accept/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "bids",
+                "1",
+                "accept"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject Bid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/bids/1/reject/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "bids",
+                "1",
+                "reject"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Escrow",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/escrow/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "escrow"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pay Escrow (M-Pesa)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/escrow/1/pay/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "escrow",
+                "1",
+                "pay"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"0725035925\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Release Escrow",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketplace/escrow/1/release/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "marketplace",
+                "escrow",
+                "1",
+                "release"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Community Forum",
+      "item": [
+        {
+          "name": "List Posts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/posts/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "posts"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/posts/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "posts"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Why are my maize leaves turning yellow?\",\n  \"body\": \"Yellowing from the bottom leaves upward in Nakuru.\",\n  \"crop_tag\": \"maize\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "AI Co-Pilot Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/posts/1/ai_answer/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "posts",
+                "1",
+                "ai_answer"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upvote Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/posts/1/upvote/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "posts",
+                "1",
+                "upvote"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Replies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/replies/?post=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "replies",
+                "?post=1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Reply",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/replies/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "replies"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"post\": 1,\n  \"body\": \"This looks like nitrogen deficiency.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Carbon Credits",
+      "item": [
+        {
+          "name": "List Activities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "carbon"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Log Activity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "carbon"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm\": 1,\n  \"practice\": \"agroforestry\",\n  \"area_hectares\": \"5.0\",\n  \"estimated_tonnes\": \"12.5\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Activity",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Activity",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/carbon/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "carbon",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Finance",
+      "item": [
+        {
+          "name": "List Ledger",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/finance/ledger/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "finance",
+                "ledger"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Log Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/finance/ledger/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "finance",
+                "ledger"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm\": 1,\n  \"entry_type\": \"sale\",\n  \"description\": \"Maize sale to cooperative\",\n  \"amount\": \"22500.00\",\n  \"date\": \"2026-07-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "P&L Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/finance/ledger/summary/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "finance",
+                "ledger",
+                "summary"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Entry",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/finance/ledger/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "finance",
+                "ledger",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Satellite",
+      "item": [
+        {
+          "name": "List NDVI Readings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh NDVI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/satellite/refresh/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "satellite",
+                "refresh"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Global Search",
+      "item": [
+        {
+          "name": "Search All",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/search/?q=maize",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "search",
+                "?q=maize"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cooperatives",
+      "item": [
+        {
+          "name": "List Cooperatives",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/cooperatives/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "cooperatives"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Cooperative",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/cooperatives/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "cooperatives"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nakuru Farmers Cooperative\",\n  \"description\": \"Joint marketing.\",\n  \"location\": \"Nakuru, Kenya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Livestock",
+      "item": [
+        {
+          "name": "List Animals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/livestock/animals/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "livestock",
+                "animals"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Animal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/livestock/animals/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "livestock",
+                "animals"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm\": 1,\n  \"species\": \"cattle\",\n  \"breed\": \"Friesian\",\n  \"tag_number\": \"KE-001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Health Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/livestock/health/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "livestock",
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Log Health Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/livestock/health/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "livestock",
+                "health"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"animal\": 1,\n  \"symptom\": \"limping on left front leg\",\n  \"treatment\": \"applied iodine, rest recommended\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Soil",
+      "item": [
+        {
+          "name": "List Soil Readings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/soil/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "soil"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Log Soil Reading",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/soil/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "soil"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farm\": 1,\n  \"ph\": 6.5,\n  \"nitrogen\": 45,\n  \"phosphorus\": 30,\n  \"potassium\": 200,\n  \"source\": \"manual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Seeds",
+      "item": [
+        {
+          "name": "List Seeds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/seeds/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "seeds"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Traceability",
+      "item": [
+        {
+          "name": "List Batches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/traceability/batches/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "traceability",
+                "batches"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/traceability/entries/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "traceability",
+                "entries"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"batch\": 1,\n  \"action\": \"transported\",\n  \"notes\": \"Delivered to Nakuru depot\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drones",
+      "item": [
+        {
+          "name": "List Operators",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/drones/operators/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "drones",
+                "operators"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Book Drone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/drones/bookings/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "drones",
+                "bookings"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operator\": 1,\n  \"service_date\": \"2026-07-15\",\n  \"area_hectares\": 5,\n  \"total_cost\": \"2500.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/drones/bookings/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "drones",
+                "bookings"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Equipment",
+      "item": [
+        {
+          "name": "List Equipment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/equipment/listings/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "equipment",
+                "listings"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Book Equipment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/equipment/bookings/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "equipment",
+                "bookings"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"equipment\": 1,\n  \"start_date\": \"2026-07-10\",\n  \"end_date\": \"2026-07-12\",\n  \"total_cost\": \"3000.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "item": [
+        {
+          "name": "List Food Security Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alerts/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "alerts"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Account Settings",
+      "item": [
+        {
+          "name": "Account Page",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "dashboard",
+                "account"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  try {",
+                  "    var json = pm.response.json();",
+                  "    if (json.access)  pm.environment.set('access_token',  json.access);",
+                  "    if (json.refresh) pm.environment.set('refresh_token', json.refresh);",
+                  "    if (json.id)      pm.environment.set('last_id', json.id);",
+                  "  } catch(e) {}",
+                  "}",
+                  "pm.test('Status ok', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200,201,204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

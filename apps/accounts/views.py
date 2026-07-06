@@ -5,6 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.shortcuts import render
 from django.conf import settings
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
 from .serializers import RegisterSerializer, UserSerializer, ChangePasswordSerializer
 
 User = get_user_model()
@@ -25,8 +26,29 @@ def marketplace_page(request):return render(request, 'marketplace/index.html', _
 def forum_page(request):      return render(request, 'forum/index.html', _ctx())
 def finance_page(request):    return render(request, 'dashboard/finance.html', _ctx())
 def carbon_page(request):     return render(request, 'dashboard/carbon.html', _ctx())
+def account_page(request):    return render(request, 'dashboard/account.html', _ctx())
 
 
+@extend_schema(
+    tags=['auth'],
+    summary='Register a new user account',
+    description='Creates a new user and returns JWT access and refresh tokens.',
+    request=RegisterSerializer,
+    responses={201: UserSerializer},
+    examples=[
+        OpenApiExample('Example Request', value={
+            'first_name': 'John', 'last_name': 'Doe',
+            'email': 'john@farm.com', 'password': 'Testpass123!',
+            'password2': 'Testpass123!', 'role': 'farmer',
+            'phone': '+254712345678', 'country': 'Kenya'
+        }, request_only=True),
+        OpenApiExample('Example Response', value={
+            'user': {'id': 1, 'email': 'john@farm.com', 'role': 'farmer'},
+            'access': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            'refresh': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        }, response_only=True),
+    ]
+)
 class RegisterView(generics.CreateAPIView):
     queryset           = User.objects.all()
     serializer_class   = RegisterSerializer
@@ -44,14 +66,17 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(tags=['auth'], summary='Retrieve and update the authenticated user profile')
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class   = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     def get_object(self): return self.request.user
 
 
+@extend_schema(tags=['auth'], summary='Change the authenticated user password')
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -63,8 +88,10 @@ class ChangePasswordView(APIView):
         return Response({'message': 'password updated successfully'})
 
 
+@extend_schema(tags=['auth'], summary='Logout and blacklist the refresh token')
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
         try:
             token = RefreshToken(request.data['refresh'])
@@ -72,7 +99,3 @@ class LogoutView(APIView):
             return Response({'message': 'logged out successfully'})
         except Exception:
             return Response({'error': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-def account_page(request):
-    return render(request, 'dashboard/account.html', _ctx())
