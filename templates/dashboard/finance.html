@@ -3,40 +3,88 @@
 {% block nav_finance %}active{% endblock %}
 {% block dash_title %}farm finance{% endblock %}
 {% block dash_content %}
+<div class="page-actions">
+  <button class="btn-primary" id="openAddEntry">+ log income or expense</button>
+</div>
 <div class="dash-grid">
-  <div class="dash-card">
-    <h3>profit & loss summary</h3>
-    <div id="financeSummary"><p class="loading-text">loading...</p></div>
-  </div>
-  <div class="dash-card">
-    <h3>recent ledger entries</h3>
+  <div class="dash-card" style="grid-column:span 2">
+    <h3>financial summary</h3>
+    <div id="financeSummary" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
+      <p class="loading-text">loading...</p>
+    </div>
+    <h3>ledger entries</h3>
     <div id="ledgerList"><p class="loading-text">loading...</p></div>
   </div>
 </div>
+<div class="modal-overlay" id="addEntryModal"><div class="modal">
+  <h3>log entry</h3>
+  <form id="addEntryForm">
+    <div class="form-group"><label>farm</label>
+      <select name="farm" id="entryFarmSelect" required><option value="">loading...</option></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>type</label>
+        <select name="entry_type">
+          <option value="sale">sale / income</option>
+          <option value="input">farm input</option>
+          <option value="expense">other expense</option>
+        </select>
+      </div>
+      <div class="form-group"><label>amount (ksh)</label>
+        <input type="number" name="amount" step="0.01" required>
+      </div>
+    </div>
+    <div class="form-group"><label>description</label>
+      <input type="text" name="description" required placeholder="e.g. maize sale to cooperative">
+    </div>
+    <div class="form-group"><label>date</label>
+      <input type="date" name="date" required>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn-outline" onclick="document.getElementById('addEntryModal').classList.remove('open')">cancel</button>
+      <button type="submit" class="btn-primary">save entry</button>
+    </div>
+  </form>
+  <p class="form-error" id="entryError"></p>
+</div></div>
 {% endblock %}
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-  const sumRes = await apiFetch('/api/finance/ledger/summary/');
-  if (sumRes && sumRes.ok) {
-    const d = await sumRes.json();
-    document.getElementById('financeSummary').innerHTML = `
-      <div class="dash-stat"><p class="stat-label">income</p><h2 class="stat-value" style="color:#4a7c3f">ksh ${d.income}</h2></div>
-      <div class="dash-stat"><p class="stat-label">expenses</p><h2 class="stat-value" style="color:#e05252">ksh ${d.expenses}</h2></div>
-      <div class="dash-stat"><p class="stat-label">profit</p><h2 class="stat-value">ksh ${d.profit}</h2></div>`;
-  }
-
-  const ledgerRes = await apiFetch('/api/finance/ledger/');
-  if (ledgerRes && ledgerRes.ok) {
-    const data    = await ledgerRes.json();
-    const entries = data.results || data;
-    const list    = document.getElementById('ledgerList');
-    list.innerHTML = '';
-    entries.forEach(e => {
-      list.innerHTML += `<div class="scan-item"><h5>${e.description} <span class="badge badge-${e.entry_type === 'sale' ? 'confirmed' : 'pending'}">${e.entry_type}</span></h5><p>ksh ${e.amount} &bull; ${e.date}</p></div>`;
-    });
-    if (!entries.length) list.innerHTML = '<p class="loading-text">no entries yet.</p>';
-  }
+document.addEventListener('DOMContentLoaded',()=>{
+  loadSummary(); loadLedger(); loadFarms();
+  document.getElementById('openAddEntry').addEventListener('click',()=>document.getElementById('addEntryModal').classList.add('open'));
+  document.getElementById('addEntryForm').addEventListener('submit', async (e)=>{
+    e.preventDefault(); const form=e.target; const error=document.getElementById('entryError'); error.textContent='';
+    const res=await apiFetch('/api/finance/ledger/',{method:'POST',body:JSON.stringify({
+      farm:form.farm.value, entry_type:form.entry_type.value,
+      amount:form.amount.value, description:form.description.value, date:form.date.value
+    })});
+    if(res&&res.ok){document.getElementById('addEntryModal').classList.remove('open');form.reset();loadSummary();loadLedger();}
+    else if(res){const d=await res.json();error.textContent=Object.values(d).flat().join(' ');}
+  });
 });
+async function loadFarms(){
+  const res=await apiFetch('/api/farms/'); if(!res||!res.ok) return;
+  const farms=(await res.json()).results||[];
+  document.getElementById('entryFarmSelect').innerHTML=farms.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+}
+async function loadSummary(){
+  const el=document.getElementById('financeSummary');
+  const res=await apiFetch('/api/finance/ledger/summary/'); if(!res||!res.ok){el.innerHTML='<p class="loading-text">could not load summary.</p>';return;}
+  const d=await res.json();
+  el.innerHTML=`
+    <div class="dash-stat"><p class="stat-label">total income</p><h2 class="stat-value" style="font-size:24px;color:#4a7c3f">ksh ${Number(d.income||0).toLocaleString()}</h2></div>
+    <div class="dash-stat"><p class="stat-label">total expenses</p><h2 class="stat-value" style="font-size:24px;color:#e05252">ksh ${Number(d.expenses||0).toLocaleString()}</h2></div>
+    <div class="dash-stat"><p class="stat-label">net profit</p><h2 class="stat-value" style="font-size:24px;color:${d.profit>=0?'#4a7c3f':'#e05252'}">ksh ${Number(d.profit||0).toLocaleString()}</h2></div>`;
+}
+async function loadLedger(){
+  const list=document.getElementById('ledgerList');
+  const res=await apiFetch('/api/finance/ledger/'); if(!res||!res.ok){list.innerHTML='<p class="loading-text">could not load.</p>';return;}
+  const entries=(await res.json()).results||[];
+  list.innerHTML=entries.length?entries.map(e=>`<div class="scan-item" style="display:flex;justify-content:space-between">
+    <div><strong>${e.description}</strong><p style="font-size:12px;color:#888">${e.entry_type} &bull; ${e.date}</p></div>
+    <strong style="color:${e.entry_type==='sale'?'#4a7c3f':'#e05252'}">${e.entry_type==='sale'?'+':'-'}ksh ${Number(e.amount).toLocaleString()}</strong>
+  </div>`).join(''):'<p class="loading-text">no entries yet. log your first income or expense above.</p>';
+}
 </script>
 {% endblock %}
