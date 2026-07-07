@@ -38,19 +38,19 @@ urlpatterns = [
     path('api/disease/',            include('apps.disease.urls')),
     path('api/weather/',            include('apps.weather.urls')),
     path('api/marketplace/',        include('apps.marketplace.urls')),
-    path('api/seeds/',              include('apps.seeds.urls')),
-    path('api/cooperatives/',       include('apps.cooperatives.urls')),
-    path('api/livestock/',          include('apps.livestock.urls')),
-    path('api/insurance/',          include('apps.insurance.urls')),
-    path('api/soil/',               include('apps.soil.urls')),
+    
+    
+    
+    
+    
     path('api/satellite/',          include('apps.satellite.urls')),
     path('api/forum/',              include('apps.forum.urls')),
-    path('api/traceability/',       include('apps.traceability.urls')),
+    
     path('api/carbon/',             include('apps.carbon.urls')),
-    path('api/drones/',             include('apps.drones.urls')),
+    
     path('api/finance/',            include('apps.finance.urls')),
-    path('api/ivr/',                include('apps.ivr.urls')),
+    
     path('api/alerts/',             include('apps.alerts.urls')),
-    path('api/equipment/',          include('apps.equipment.urls')),
-    path('api/campaigns/',          include('apps.campaigns.urls')),
+    
+    
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

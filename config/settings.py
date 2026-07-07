@@ -52,22 +52,22 @@ LOCAL_APPS = [
     'apps.disease',
     'apps.weather',
     'apps.marketplace',
-    'apps.seeds',
-    'apps.cooperatives',
-    'apps.livestock',
-    'apps.insurance',
-    'apps.soil',
+    
+    
+    
+    
+    
     'apps.satellite',
     'apps.forum',
-    'apps.academy',
-    'apps.traceability',
+    
+    
     'apps.carbon',
-    'apps.drones',
+    
     'apps.finance',
-    'apps.ivr',
+    
     'apps.alerts',
-    'apps.equipment',
-    'apps.campaigns',
+    
+    
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
