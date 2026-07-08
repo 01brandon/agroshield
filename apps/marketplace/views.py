@@ -16,7 +16,6 @@ class ListingViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def mine(self, request):
-        # show all own listings including sold ones
         listings = Listing.objects.filter(farmer=request.user)
         return Response(ListingSerializer(listings, many=True).data)
 
@@ -26,7 +25,7 @@ class BidViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        qs = Bid.objects.select_related('buyer','listing').all()
+        qs         = Bid.objects.select_related('buyer', 'listing').all()
         listing_id = self.request.query_params.get('listing')
         if listing_id:
             qs = qs.filter(listing_id=listing_id)
@@ -34,9 +33,10 @@ class BidViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         listing = serializer.validated_data['listing']
+        # only block the listing owner from bidding on their own listing
         if listing.farmer == self.request.user:
             from rest_framework.exceptions import ValidationError
-            raise ValidationError({'detail': 'you cannot bid on your own listing'})
+            raise ValidationError({'detail': 'you cannot bid on your own listing. only other users can place bids.'})
         serializer.save(buyer=self.request.user)
 
     @action(detail=True, methods=['post'])
@@ -44,8 +44,8 @@ class BidViewSet(viewsets.ModelViewSet):
         bid = self.get_object()
         if bid.listing.farmer != request.user:
             return Response({'detail': 'only the listing owner can accept bids'}, status=403)
-        bid.status           = 'accepted'
-        bid.listing.status   = 'sold'
+        bid.status         = 'accepted'
+        bid.listing.status = 'sold'
         bid.save()
         bid.listing.save()
         EscrowTransaction.objects.create(
@@ -82,7 +82,7 @@ class EscrowViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'phone number required'}, status=400)
         from .mpesa import stk_push
         result = stk_push(phone_number=phone, amount=escrow.amount,
-                           account_reference=f'AGRO{escrow.id}', description='agroshield payment')
+                          account_reference=f'AGRO{escrow.id}', description='agroshield payment')
         if result['success']:
             escrow.mpesa_reference = result.get('checkout_id', '')
             escrow.save()

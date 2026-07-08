@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script>
+  // skip the intermediate page entirely — auto-submit to go straight to google
+  window.onload = function() {
+    document.getElementById('autoForm').submit();
+  };
+</script>
+</head>
+<body>
+  <form id="autoForm" method="post" action="">
+    {% csrf_token %}
+    <input type="hidden" name="process" value="login">
+    <noscript><button type="submit">Continue with Google</button></noscript>
+  </form>
+</body>
+</html>
