@@ -21,22 +21,9 @@ A single Django-powered platform with **20 interconnected modules** covering eve
 | Weather Intelligence | Celery pulls OpenWeatherMap every 3 hours per farm GPS → SMS + push alerts for drought, frost, flood |
 | Farmer Marketplace | Live auction and fixed-price listings with M-Pesa Daraja escrow payments |
 | Satellite Field Monitoring | Planet API NDVI maps updated every 5 days showing field health |
-| Parametric Crop Insurance | Automatic M-Pesa payouts when weather thresholds are crossed — no claim form |
-| Cooperative Management | Group farming, shared ledger, bulk buying, group wallet |
 | Farm Finance Dashboard | P&L per crop season, credit scoring, tax assistant |
 | Carbon Credits | Log sustainable practices, earn and sell verified carbon certificates |
-| Community Forum | AI co-pilot (OpenAI GPT-4o-mini) + verified agronomist replies |
-| E-Learning Academy | Video courses with QR-verified PDF completion certificates |
-| Farm-to-Table Traceability | QR codes track produce from soil to supermarket shelf |
-| Livestock Health | Symptom checker, vet directory, vaccination reminders |
-| Soil Health & Irrigation | IoT sensor integration via MQTT, smart irrigation scheduling |
-| Drone Services | Book licensed drone operators for spraying and field mapping |
-| Equipment Rental | Peer-to-peer tractor and equipment marketplace |
-| Seed & Input Store | Certified seeds and fertiliser from verified agro-dealers |
-| NGO Analytics Dashboard | Geospatial food security maps and exportable policy reports |
-| Emergency Alerts | Automated regional food security risk alerts to government |
-| IVR Voice Assistant | Farmers call a number and interact entirely by voice in Swahili or English |
-| Push Campaign Manager | Admin SMS, push, and email campaigns segmented by crop or region |
+| Community Forum | AI co-pilot (OpenAI GPT-4o-mini) + verified agronomist 
 
 ---
 
@@ -105,23 +92,11 @@ agroshield/
 │   ├── farms/           # farm registration and management
 │   ├── disease/         # crop scan + Google Vision AI
 │   ├── weather/         # OpenWeatherMap + alerts + Twilio SMS
-│   ├── marketplace/     # listings, auctions, M-Pesa escrow
-│   ├── seeds/           # seed and input storefront
-│   ├── cooperatives/    # farmer group management
-│   ├── livestock/       # animal health and vet connect
-│   ├── insurance/       # parametric crop insurance
-│   ├── soil/            # soil readings and IoT MQTT
+│   ├── marketplace/     # listings, auctions, M-Pesa escrew
 │   ├── satellite/       # Planet NDVI monitoring
 │   ├── forum/           # community forum + OpenAI co-pilot
-│   ├── academy/         # e-learning courses and certificates
-│   ├── traceability/    # QR supply chain tracking
 │   ├── carbon/          # carbon credit logging and verification
-│   ├── drones/          # drone operator bookings
 │   ├── finance/         # farm ledger and credit scoring
-│   ├── ivr/             # voice interaction logs
-│   ├── alerts/          # food security risk alerts
-│   ├── equipment/       # peer-to-peer equipment rental
-│   └── campaigns/       # push notification campaigns
 ├── config/
 │   ├── settings.py
 │   ├── urls.py
@@ -311,13 +286,6 @@ GET    /api/finance/ledger/summary/ Get P&L summary
 
 ---
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-module`
-3. Make migrations: `docker-compose exec web python manage.py makemigrations`
-4. Run checks: `docker-compose exec web python manage.py check`
-5. Submit a pull request
 
 ---
 
@@ -326,11 +294,6 @@ GET    /api/finance/ledger/summary/ Get P&L summary
 MIT License — see `LICENSE` for details.
 
 ---
-
-## Developer
-
-**Brandon Muruthi**
-Built as a capstone project demonstrating full-stack Django development with 20 interconnected modules, 25+ API integrations, Docker containerisation, and AI-powered features solving a documented global food security crisis.
 
 ---
 
