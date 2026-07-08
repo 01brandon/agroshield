@@ -68,7 +68,8 @@ agroshield/
 └── requirements.txt## Getting Started
 
 ```
-```bash
+## Bash
+```
 git clone https://github.com/yourusername/agroshield.git
 cd agroshield
 cp .env.example .env
