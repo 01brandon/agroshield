@@ -292,9 +292,11 @@ GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 # railway production URL for oauth
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
+
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'AgroShield API',
-    'DESCRIPTION': 'AgroShield REST API for 20 modules including crop disease detection, weather, marketplace, forum, carbon credits, finance, and satellite monitoring.',
+    'DESCRIPTION': 'REST API for AgroShield — AI-powered food security platform. 9 active modules: authentication, farms, crop disease detection, weather intelligence, marketplace, community forum, carbon credits, farm finance, and satellite monitoring.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SERVERS': [
@@ -302,26 +304,16 @@ SPECTACULAR_SETTINGS = {
         {'url': 'http://localhost:8000', 'description': 'Local Development'},
     ],
     'TAGS': [
-        {'name': 'auth',         'description': 'Registration, login, JWT tokens, Google OAuth.'},
-        {'name': 'farms',        'description': 'Farm registration and management.'},
-        {'name': 'disease',      'description': 'AI crop disease detection via Google Gemini Vision.'},
-        {'name': 'weather',      'description': 'Weather readings and alerts from OpenWeatherMap.'},
-        {'name': 'marketplace',  'description': 'Listings, bids, and M-Pesa escrow payments.'},
-        {'name': 'forum',        'description': 'Community forum with AI co-pilot.'},
-        {'name': 'carbon',       'description': 'Carbon credit logging and verification.'},
-        {'name': 'finance',      'description': 'Farm P&L ledger and financial summary.'},
-        {'name': 'satellite',    'description': 'Planet API satellite NDVI monitoring.'},
-        {'name': 'search',       'description': 'Global search across farms, posts, and listings.'},
-        {'name': 'cooperatives', 'description': 'Farmer cooperative groups.'},
-        {'name': 'livestock',    'description': 'Animal health tracking.'},
-        {'name': 'soil',         'description': 'Soil health readings.'},
-        {'name': 'seeds',        'description': 'Certified seed and input store.'},
-        {'name': 'traceability', 'description': 'QR code supply chain tracking.'},
-        {'name': 'drones',       'description': 'Drone operator bookings.'},
-        {'name': 'equipment',    'description': 'Farm equipment rental.'},
-        {'name': 'alerts',       'description': 'Food security risk alerts.'},
-        {'name': 'campaigns',    'description': 'Push notification campaigns.'},
-        {'name': 'ivr',          'description': 'USSD and IVR logs.'},
+        {'name': 'auth',        'description': 'Registration, login, JWT token management, profile updates.'},
+        {'name': 'farms',       'description': 'Farm registration, GPS coordinates, and crop type management.'},
+        {'name': 'disease',     'description': 'AI crop disease detection using Google Gemini 1.5 Flash vision.'},
+        {'name': 'weather',     'description': 'Weather readings and alerts from OpenWeatherMap per farm GPS.'},
+        {'name': 'marketplace', 'description': 'Produce listings, live auctions, bids, and M-Pesa escrow payments.'},
+        {'name': 'forum',       'description': 'Community forum posts, replies, upvotes, and Gemini AI co-pilot.'},
+        {'name': 'carbon',      'description': 'Sustainable farming carbon credit logging and auto-verification.'},
+        {'name': 'finance',     'description': 'Farm income and expense ledger, P&L summary, credit scoring.'},
+        {'name': 'satellite',   'description': 'Planet API satellite NDVI field health monitoring.'},
+        {'name': 'search',      'description': 'Global search across farms, posts, and listings.'},
     ],
     'SWAGGER_UI_SETTINGS': {
         'deepLinking': True,
