@@ -67,6 +67,7 @@ agroshield/
 ├── Dockerfile
 └── requirements.txt## Getting Started
 
+```
 ```bash
 git clone https://github.com/yourusername/agroshield.git
 cd agroshield
