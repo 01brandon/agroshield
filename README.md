@@ -39,6 +39,8 @@ API Docs: https://agroshield-production-f5fc.up.railway.app/api/schema/swagger-u
 | Docs | drf-spectacular, Swagger UI, Postman |
 
 ## Project Structure
+
+```
 agroshield/
 ├── apps/
 │   ├── accounts/     # user model, JWT auth, profile
